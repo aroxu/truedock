@@ -1,0 +1,7 @@
+# Localization is generated from ARB files in lib/l10n. English is the
+# template; new locales are added by dropping in app_<locale>.arb.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
