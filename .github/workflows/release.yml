@@ -60,6 +60,11 @@ jobs:
           TRUEDOCK_SENTRY_DSN: ${{ secrets.TRUEDOCK_SENTRY_DSN }}
         run: bash tool/build_android_release.sh --split-per-abi
 
+      - name: Build Android App Bundle
+        env:
+          TRUEDOCK_SENTRY_DSN: ${{ secrets.TRUEDOCK_SENTRY_DSN }}
+        run: bash tool/build_android_release.sh --skip-pub-get --skip-apk --aab
+
       - name: Build iOS IPA (unsigned for AltStore)
         run: |
           flutter build ios --release --no-codesign
@@ -102,6 +107,7 @@ jobs:
             build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/bundle/release/app-release.aab
             truedock.ipa
             apps.json
           generate_release_notes: true
