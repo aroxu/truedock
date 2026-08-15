@@ -82,6 +82,10 @@ extension AppsLocalizations on AppLocalizations {
     ).firstMatch(normalized);
     if (timezone != null) return timezone.group(1)!;
 
+    // Catalog text is only translated for the Korean locale; every other
+    // supported locale keeps the server-provided English source text.
+    if (!localeName.startsWith('ko')) return normalized;
+
     const exact = <String, String>{
       'Configuration': '구성',
       'App Configuration': '앱 구성',
