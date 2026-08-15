@@ -118,19 +118,38 @@ class _MetricsGrid extends StatelessWidget {
         : activeAlerts.any((alert) => alert.isCritical)
         ? l10n.healthAttention
         : l10n.healthHealthy;
-    final items = [
+    final items = <(IconData, String, Widget)>[
       (
         Icons.developer_board_outlined,
         l10n.metricCpuCores,
-        info?.cores.toString() ?? '—',
+        Text(
+          info?.cores.toString() ?? '—',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
-      (Icons.memory_rounded, l10n.metricMemory, memory),
       (
-        Icons.schedule_rounded,
-        l10n.metricUptime,
-        info?.formattedUptime(l10n) ?? '—',
+        Icons.memory_rounded,
+        l10n.metricMemory,
+        Text(
+          memory,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
-      (Icons.health_and_safety_outlined, l10n.metricHealth, health),
+      (Icons.schedule_rounded, l10n.metricUptime, _LiveUptime(info: info)),
+      (
+        Icons.health_and_safety_outlined,
+        l10n.metricHealth,
+        Text(
+          health,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
     ];
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -160,12 +179,7 @@ class _MetricsGrid extends StatelessWidget {
                   children: [
                     Icon(item.$1, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 8),
-                    Text(
-                      item.$3,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    item.$3,
                     Text(item.$2, style: Theme.of(context).textTheme.bodySmall),
                   ],
                 ),
@@ -180,6 +194,38 @@ class _MetricsGrid extends StatelessWidget {
   static String _formatBytes(int bytes) {
     final gib = bytes / (1024 * 1024 * 1024);
     return '${gib.toStringAsFixed(gib >= 10 ? 0 : 1)} GiB';
+  }
+}
+
+class _LiveUptime extends StatelessWidget {
+  const _LiveUptime({required this.info});
+
+  final SystemInfo? info;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    if (info == null) {
+      return Text(
+        '—',
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium,
+      );
+    }
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, _) => FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          info!.formattedUptime(l10n),
+          maxLines: 1,
+          style: theme.textTheme.titleMedium,
+        ),
+      ),
+    );
   }
 }
 

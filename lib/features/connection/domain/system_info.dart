@@ -9,6 +9,7 @@ class SystemInfo {
     required this.physicalMemoryBytes,
     required this.cpuModel,
     required this.cores,
+    this.fetchedAt,
   });
 
   factory SystemInfo.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class SystemInfo {
       physicalMemoryBytes: json['physmem'] as int? ?? 0,
       cpuModel: json['model'] as String? ?? 'Unknown CPU',
       cores: json['cores'] as int? ?? 0,
+      fetchedAt: DateTime.now(),
     );
   }
 
@@ -30,6 +32,7 @@ class SystemInfo {
   final int physicalMemoryBytes;
   final String cpuModel;
   final int cores;
+  final DateTime? fetchedAt;
 
   /// Returns a localized, human-readable representation of [uptimeSeconds].
   ///
@@ -37,8 +40,11 @@ class SystemInfo {
   /// English (e.g. `1 day, 08:14:37`), so the representation can adapt to
   /// plural rules and translations across all supported client locales.
   String formattedUptime(AppLocalizations l10n) {
-    final total = uptimeSeconds.round();
+    var total = uptimeSeconds.round();
     if (total <= 0) return uptime;
+    if (fetchedAt != null) {
+      total += DateTime.now().difference(fetchedAt!).inSeconds;
+    }
 
     final days = total ~/ 86400;
     final remainder = total % 86400;

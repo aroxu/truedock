@@ -34,8 +34,8 @@ class SentryDiagnosticsBackend implements DiagnosticsBackend {
     this.debug = false,
     this.tracesSampleRate = 0.1,
     double? profilesSampleRate,
-  }) : profilesSampleRate =
-           (profilesSampleRate ?? _sentryProfilesSampleRate).clamp(0.0, 1.0);
+  }) : profilesSampleRate = (profilesSampleRate ?? _sentryProfilesSampleRate)
+           .clamp(0.0, 1.0);
 
   final String dsn;
   final String environment;
