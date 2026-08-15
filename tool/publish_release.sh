@@ -105,10 +105,11 @@ sed -E -i.bak "s/^version:[[:space:]]*.*/version: $new_version/" "$pubspec"
 rm -f "$pubspec.bak"
 
 git add -A
-# [skip ci] keeps this version-bump commit from triggering the regular CI
-# workflow on the branch push below. release.yml already runs its own
-# lint/test gate before building, so a second CI run would be redundant.
-git commit -m "🔖 chore(release): $tag [skip ci]"
+# ci.yml already excludes tag pushes via tags-ignore, and this same commit
+# is what the tag below points at. Do NOT add [skip ci] here: GitHub treats
+# that marker at the commit level, so it would also suppress the tag push
+# event that release.yml depends on, silently skipping the release build.
+git commit -m "🔖 chore(release): $tag"
 git tag "$tag"
 git push origin "$branch"
 git push origin "$tag"
