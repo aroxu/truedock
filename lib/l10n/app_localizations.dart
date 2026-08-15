@@ -320,6 +320,12 @@ abstract class AppLocalizations {
   /// **'Uptime'**
   String get metricUptime;
 
+  /// No description provided for @metricUptimeDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{{time}} =1{1 day, {time}} other{{days} days, {time}}}'**
+  String metricUptimeDuration(int days, String time);
+
   /// No description provided for @metricMemory.
   ///
   /// In en, this message translates to:
@@ -19425,6 +19431,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System tunable deleted.'**
   String get sysTunableDeleted;
+
+  /// No description provided for @navAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get navAbout;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About TrueDock'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Version, licenses, and project links'**
+  String get aboutSettingsSubtitle;
+
+  /// No description provided for @aboutTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Dock your TrueNAS'**
+  String get aboutTagline;
+
+  /// No description provided for @aboutMadeWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Made with ❤️ in 🇰🇷'**
+  String get aboutMadeWith;
+
+  /// No description provided for @aboutSectionApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Application'**
+  String get aboutSectionApp;
+
+  /// No description provided for @aboutVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get aboutVersionLabel;
+
+  /// No description provided for @aboutVersionValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (build {build})'**
+  String aboutVersionValue(String version, String build);
+
+  /// No description provided for @aboutLicenseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get aboutLicenseLabel;
+
+  /// No description provided for @aboutSectionProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Project'**
+  String get aboutSectionProject;
+
+  /// No description provided for @aboutRepositoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get aboutRepositoryLabel;
+
+  /// No description provided for @aboutRepositorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the sources, report an issue, or contribute on GitHub.'**
+  String get aboutRepositorySubtitle;
+
+  /// No description provided for @aboutSectionOpenSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Open source licenses'**
+  String get aboutSectionOpenSource;
+
+  /// No description provided for @aboutOpenSourceIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'TrueDock is built on these open source packages. Thank you to their maintainers.'**
+  String get aboutOpenSourceIntro;
+
+  /// No description provided for @aboutOpenSourceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 package} other{{count} packages}}'**
+  String aboutOpenSourceCount(int count);
+
+  /// No description provided for @aboutLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link on this device.'**
+  String get aboutLinkFailed;
+
+  /// No description provided for @aboutOpenSourceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Packages bundled into TrueDock and their licenses'**
+  String get aboutOpenSourceSubtitle;
+
+  /// No description provided for @aboutPackageOpenPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open package page'**
+  String get aboutPackageOpenPage;
+
+  /// No description provided for @aboutPackageLicenseUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No bundled license text was found for this package. Use the package page to view its license.'**
+  String get aboutPackageLicenseUnavailable;
 }
 
 class _AppLocalizationsDelegate

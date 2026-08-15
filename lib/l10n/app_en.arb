@@ -109,6 +109,12 @@
   "@overviewHeroDescription": {},
   "metricUptime": "Uptime",
   "@metricUptime": {},
+  "metricUptimeDuration": "{days, plural, =0{{time}} =1{1 day, {time}} other{{days} days, {time}}}", "@metricUptimeDuration": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "time": { "type": "String" }
+    }
+  },
   "metricMemory": "Memory",
   "@metricMemory": {},
   "metricCpuCores": "CPU cores",
@@ -3802,5 +3808,33 @@
   "sysTunableDeleteConsequence": "The stored override is removed. A reboot or device event may be required before the running value fully reverts.", "@sysTunableDeleteConsequence": {},
   "sysTunableCreated": "System tunable added.", "@sysTunableCreated": {},
   "sysTunableUpdated": "System tunable updated.", "@sysTunableUpdated": {},
-  "sysTunableDeleted": "System tunable deleted.", "@sysTunableDeleted": {}
+  "sysTunableDeleted": "System tunable deleted.", "@sysTunableDeleted": {},
+  "navAbout": "About", "@navAbout": {},
+  "aboutTitle": "About TrueDock", "@aboutTitle": {},
+  "aboutSettingsSubtitle": "Version, licenses, and project links", "@aboutSettingsSubtitle": {},
+  "aboutTagline": "Dock your TrueNAS", "@aboutTagline": {},
+  "aboutMadeWith": "Made with ❤️ in 🇰🇷", "@aboutMadeWith": {},
+  "aboutSectionApp": "Application", "@aboutSectionApp": {},
+  "aboutVersionLabel": "Version", "@aboutVersionLabel": {},
+  "aboutVersionValue": "{version} (build {build})", "@aboutVersionValue": {
+    "placeholders": {
+      "version": { "type": "String" },
+      "build": { "type": "String" }
+    }
+  },
+  "aboutLicenseLabel": "License", "@aboutLicenseLabel": {},
+  "aboutSectionProject": "Project", "@aboutSectionProject": {},
+  "aboutRepositoryLabel": "Source code", "@aboutRepositoryLabel": {},
+  "aboutRepositorySubtitle": "Browse the sources, report an issue, or contribute on GitHub.", "@aboutRepositorySubtitle": {},
+  "aboutSectionOpenSource": "Open source licenses", "@aboutSectionOpenSource": {},
+  "aboutOpenSourceIntro": "TrueDock is built on these open source packages. Thank you to their maintainers.", "@aboutOpenSourceIntro": {},
+  "aboutOpenSourceCount": "{count, plural, =1{1 package} other{{count} packages}}", "@aboutOpenSourceCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "aboutLinkFailed": "Could not open the link on this device.", "@aboutLinkFailed": {},
+  "aboutOpenSourceSubtitle": "Packages bundled into TrueDock and their licenses", "@aboutOpenSourceSubtitle": {},
+  "aboutPackageOpenPage": "Open package page", "@aboutPackageOpenPage": {},
+  "aboutPackageLicenseUnavailable": "No bundled license text was found for this package. Use the package page to view its license.", "@aboutPackageLicenseUnavailable": {}
 }

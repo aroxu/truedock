@@ -125,7 +125,11 @@ class _MetricsGrid extends StatelessWidget {
         info?.cores.toString() ?? '—',
       ),
       (Icons.memory_rounded, l10n.metricMemory, memory),
-      (Icons.schedule_rounded, l10n.metricUptime, info?.uptime ?? '—'),
+      (
+        Icons.schedule_rounded,
+        l10n.metricUptime,
+        info?.formattedUptime(l10n) ?? '—',
+      ),
       (Icons.health_and_safety_outlined, l10n.metricHealth, health),
     ];
     return LayoutBuilder(

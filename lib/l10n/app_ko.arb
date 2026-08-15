@@ -104,6 +104,12 @@
   "@overviewHeroDescription": {},
   "metricUptime": "가동 시간",
   "@metricUptime": {},
+  "metricUptimeDuration": "{days, plural, =0{{time}} other{{days}일 {time}}}", "@metricUptimeDuration": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "time": { "type": "String" }
+    }
+  },
   "metricMemory": "메모리",
   "@metricMemory": {},
   "metricCpuCores": "CPU 코어",
@@ -3869,5 +3875,33 @@
   "sysTunableDeleteConsequence": "저장된 재정의가 제거됩니다. 실행 중인 값이 완전히 돌아오려면 재부팅이나 장치 이벤트가 필요할 수 있습니다.", "@sysTunableDeleteConsequence": {},
   "sysTunableCreated": "시스템 튜너블을 추가했습니다.", "@sysTunableCreated": {},
   "sysTunableUpdated": "시스템 튜너블을 업데이트했습니다.", "@sysTunableUpdated": {},
-  "sysTunableDeleted": "시스템 튜너블을 삭제했습니다.", "@sysTunableDeleted": {}
+  "sysTunableDeleted": "시스템 튜너블을 삭제했습니다.", "@sysTunableDeleted": {},
+  "navAbout": "앱 정보", "@navAbout": {},
+  "aboutTitle": "TrueDock 정보", "@aboutTitle": {},
+  "aboutSettingsSubtitle": "버전, 라이선스, 프로젝트 링크", "@aboutSettingsSubtitle": {},
+  "aboutTagline": "TrueNAS 관리의 새로운 정박지", "@aboutTagline": {},
+  "aboutMadeWith": "Made with ❤️ in 🇰🇷", "@aboutMadeWith": {},
+  "aboutSectionApp": "애플리케이션", "@aboutSectionApp": {},
+  "aboutVersionLabel": "버전", "@aboutVersionLabel": {},
+  "aboutVersionValue": "{version} (빌드 {build})", "@aboutVersionValue": {
+    "placeholders": {
+      "version": { "type": "String" },
+      "build": { "type": "String" }
+    }
+  },
+  "aboutLicenseLabel": "라이선스", "@aboutLicenseLabel": {},
+  "aboutSectionProject": "프로젝트", "@aboutSectionProject": {},
+  "aboutRepositoryLabel": "소스 코드", "@aboutRepositoryLabel": {},
+  "aboutRepositorySubtitle": "GitHub에서 소스를 보거나 문제를 제보하고 기여할 수 있습니다.", "@aboutRepositorySubtitle": {},
+  "aboutSectionOpenSource": "오픈소스 라이선스", "@aboutSectionOpenSource": {},
+  "aboutOpenSourceIntro": "TrueDock은 다음 오픈소스 패키지를 기반으로 만들어졌습니다. 관리자분들께 감사드립니다.", "@aboutOpenSourceIntro": {},
+  "aboutOpenSourceCount": "{count, plural, other{패키지 {count}개}}", "@aboutOpenSourceCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "aboutLinkFailed": "이 기기에서 링크를 열 수 없습니다.", "@aboutLinkFailed": {},
+  "aboutOpenSourceSubtitle": "TrueDock에 포함된 패키지와 라이선스", "@aboutOpenSourceSubtitle": {},
+  "aboutPackageOpenPage": "패키지 페이지 열기", "@aboutPackageOpenPage": {},
+  "aboutPackageLicenseUnavailable": "이 패키지에 번들된 라이선스 텍스트가 없습니다. 패키지 페이지에서 라이선스를 확인하세요.", "@aboutPackageLicenseUnavailable": {}
 }

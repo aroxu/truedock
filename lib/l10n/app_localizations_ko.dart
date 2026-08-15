@@ -125,6 +125,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get metricUptime => '가동 시간';
 
   @override
+  String metricUptimeDuration(int days, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days일 $time',
+      zero: '$time',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get metricMemory => '메모리';
 
   @override
@@ -11186,4 +11197,72 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sysTunableDeleted => '시스템 튜너블을 삭제했습니다.';
+
+  @override
+  String get navAbout => '앱 정보';
+
+  @override
+  String get aboutTitle => 'TrueDock 정보';
+
+  @override
+  String get aboutSettingsSubtitle => '버전, 라이선스, 프로젝트 링크';
+
+  @override
+  String get aboutTagline => 'TrueNAS 관리의 새로운 정박지';
+
+  @override
+  String get aboutMadeWith => 'Made with ❤️ in 🇰🇷';
+
+  @override
+  String get aboutSectionApp => '애플리케이션';
+
+  @override
+  String get aboutVersionLabel => '버전';
+
+  @override
+  String aboutVersionValue(String version, String build) {
+    return '$version (빌드 $build)';
+  }
+
+  @override
+  String get aboutLicenseLabel => '라이선스';
+
+  @override
+  String get aboutSectionProject => '프로젝트';
+
+  @override
+  String get aboutRepositoryLabel => '소스 코드';
+
+  @override
+  String get aboutRepositorySubtitle => 'GitHub에서 소스를 보거나 문제를 제보하고 기여할 수 있습니다.';
+
+  @override
+  String get aboutSectionOpenSource => '오픈소스 라이선스';
+
+  @override
+  String get aboutOpenSourceIntro =>
+      'TrueDock은 다음 오픈소스 패키지를 기반으로 만들어졌습니다. 관리자분들께 감사드립니다.';
+
+  @override
+  String aboutOpenSourceCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '패키지 $count개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aboutLinkFailed => '이 기기에서 링크를 열 수 없습니다.';
+
+  @override
+  String get aboutOpenSourceSubtitle => 'TrueDock에 포함된 패키지와 라이선스';
+
+  @override
+  String get aboutPackageOpenPage => '패키지 페이지 열기';
+
+  @override
+  String get aboutPackageLicenseUnavailable =>
+      '이 패키지에 번들된 라이선스 텍스트가 없습니다. 패키지 페이지에서 라이선스를 확인하세요.';
 }

@@ -127,6 +127,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metricUptime => 'Uptime';
 
   @override
+  String metricUptimeDuration(int days, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days, $time',
+      one: '1 day, $time',
+      zero: '$time',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get metricMemory => 'Memory';
 
   @override
@@ -11671,4 +11683,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sysTunableDeleted => 'System tunable deleted.';
+
+  @override
+  String get navAbout => 'About';
+
+  @override
+  String get aboutTitle => 'About TrueDock';
+
+  @override
+  String get aboutSettingsSubtitle => 'Version, licenses, and project links';
+
+  @override
+  String get aboutTagline => 'Dock your TrueNAS';
+
+  @override
+  String get aboutMadeWith => 'Made with ❤️ in 🇰🇷';
+
+  @override
+  String get aboutSectionApp => 'Application';
+
+  @override
+  String get aboutVersionLabel => 'Version';
+
+  @override
+  String aboutVersionValue(String version, String build) {
+    return '$version (build $build)';
+  }
+
+  @override
+  String get aboutLicenseLabel => 'License';
+
+  @override
+  String get aboutSectionProject => 'Project';
+
+  @override
+  String get aboutRepositoryLabel => 'Source code';
+
+  @override
+  String get aboutRepositorySubtitle =>
+      'Browse the sources, report an issue, or contribute on GitHub.';
+
+  @override
+  String get aboutSectionOpenSource => 'Open source licenses';
+
+  @override
+  String get aboutOpenSourceIntro =>
+      'TrueDock is built on these open source packages. Thank you to their maintainers.';
+
+  @override
+  String aboutOpenSourceCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count packages',
+      one: '1 package',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aboutLinkFailed => 'Could not open the link on this device.';
+
+  @override
+  String get aboutOpenSourceSubtitle =>
+      'Packages bundled into TrueDock and their licenses';
+
+  @override
+  String get aboutPackageOpenPage => 'Open package page';
+
+  @override
+  String get aboutPackageLicenseUnavailable =>
+      'No bundled license text was found for this package. Use the package page to view its license.';
 }
