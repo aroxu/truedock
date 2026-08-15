@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
+
+      - name: Run linting
+        run: |
+          python3 tool/arb_lint.py lib/l10n/app_en.arb lib/l10n/app_ko.arb
+          flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build Android APK
+        run: bash tool/build_android_release.sh --split-per-abi
+
+      - name: Build iOS IPA (unsigned for AltStore)
+        run: |
+          flutter build ios --release --no-codesign
+          mkdir -p Payload
+          mv build/ios/iphoneos/Runner.app Payload/
+          zip -qq -r truedock.ipa Payload
+
+      - name: Generate AltStore apps.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          DATE=$(date -u +"%Y-%m-%d")
+          SIZE=$(stat -f%z truedock.ipa 2>/dev/null || stat -c%s truedock.ipa)
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/truedock.ipa"
+          
+          cat <<EOF > apps.json
+          {
+            "name": "TrueDock",
+            "identifier": "me.aroxu.truedock.repo",
+            "sourceURL": "https://altstore.truedock.aroxu.me/apps.json",
+            "apps": [
+              {
+                "name": "TrueDock",
+                "bundleIdentifier": "me.aroxu.truedock",
+                "developerName": "Aroxu",
+                "version": "$VERSION",
+                "versionDate": "$DATE",
+                "versionDescription": "Release $VERSION",
+                "downloadURL": "$DOWNLOAD_URL",
+                "size": $SIZE,
+                "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/foreground.svg"
+              }
+            ]
+          }
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+            truedock.ipa
+            apps.json
+          generate_release_notes: true

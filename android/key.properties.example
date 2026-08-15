@@ -1,0 +1,6 @@
+# Copy this file to key.properties and fill in the secret values locally.
+# key.properties is ignored by Git and must never be committed.
+storeFile=~/WorkSpace/Android/aroxu.jks
+storePassword=
+keyAlias=
+keyPassword=

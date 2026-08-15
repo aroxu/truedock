@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ replaced allowBackup with these rules for cloud backup and
+  device-to-device transfer. TrueDock excludes everything: the only data worth
+  transferring is the saved server list and its credentials, and those live in
+  the hardware-backed keystore behind a biometric prompt. Copying them to
+  another device would move a credential past the device lock that protects it.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>
