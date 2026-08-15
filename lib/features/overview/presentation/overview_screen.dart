@@ -214,16 +214,18 @@ class _LiveUptime extends StatelessWidget {
         style: theme.textTheme.titleMedium,
       );
     }
-    return StreamBuilder(
-      stream: Stream.periodic(const Duration(seconds: 1)),
-      builder: (context, _) => FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.centerLeft,
-        child: Text(
-          info!.formattedUptime(l10n),
-          maxLines: 1,
-          style: theme.textTheme.titleMedium,
-        ),
+    // No dedicated timer here: AppShell already invalidates
+    // overviewReportingProvider every second while this tab is visible, which
+    // rebuilds this widget through _MetricsGrid. Piggybacking on that avoids
+    // a widget-owned Stream.periodic, which never completes and can make
+    // pumpAndSettle() hang indefinitely in tests.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Text(
+        info!.formattedUptime(l10n),
+        maxLines: 1,
+        style: theme.textTheme.titleMedium,
       ),
     );
   }
