@@ -379,6 +379,8 @@
   "@diagnosticsAnonymousTitle": {},
   "diagnosticsAnonymousDescription": "Share anonymized crash, error, and performance information to help improve TrueDock. Server addresses, accounts, resource names, API data, and credentials are never collected.",
   "@diagnosticsAnonymousDescription": {},
+  "diagnosticsPrivacyPolicy": "Privacy Policy",
+  "@diagnosticsPrivacyPolicy": {},
   "diagnosticsNotConfigured": "Diagnostic delivery is not configured for this build. This preference will be used when diagnostics are available.",
   "@diagnosticsNotConfigured": {},
   "diagnosticsSaving": "Saving diagnostic preference…",

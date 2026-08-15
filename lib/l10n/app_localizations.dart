@@ -1099,6 +1099,12 @@ abstract class AppLocalizations {
   /// **'Share anonymized crash, error, and performance information to help improve TrueDock. Server addresses, accounts, resource names, API data, and credentials are never collected.'**
   String get diagnosticsAnonymousDescription;
 
+  /// No description provided for @diagnosticsPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get diagnosticsPrivacyPolicy;
+
   /// No description provided for @diagnosticsNotConfigured.
   ///
   /// In en, this message translates to:

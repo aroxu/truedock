@@ -564,6 +564,9 @@ class AppLocalizationsKo extends AppLocalizations {
       'TrueDock 개선을 위해 익명화된 충돌, 오류 및 성능 정보를 공유합니다. 서버 주소, 계정, 리소스 이름, API 데이터 및 인증 정보는 수집하지 않습니다.';
 
   @override
+  String get diagnosticsPrivacyPolicy => '개인정보처리방침';
+
+  @override
   String get diagnosticsNotConfigured =>
       '이 빌드에는 진단 정보 전송이 구성되어 있지 않습니다. 진단 기능을 사용할 수 있게 되면 이 설정을 적용합니다.';
 
@@ -608,7 +611,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get systemAppPasswordMustChange => '현재 PIN과 다른 PIN을 입력하세요.';
 
   @override
-  String get appDataDangerSection => '기기 데이터';
+  String get appDataDangerSection => '기기 내 앱 데이터';
 
   @override
   String get appDataResetTitle => '모든 TrueDock 데이터 초기화';

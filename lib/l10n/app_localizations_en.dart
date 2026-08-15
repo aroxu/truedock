@@ -579,6 +579,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Share anonymized crash, error, and performance information to help improve TrueDock. Server addresses, accounts, resource names, API data, and credentials are never collected.';
 
   @override
+  String get diagnosticsPrivacyPolicy => 'Privacy Policy';
+
+  @override
   String get diagnosticsNotConfigured =>
       'Diagnostic delivery is not configured for this build. This preference will be used when diagnostics are available.';
 

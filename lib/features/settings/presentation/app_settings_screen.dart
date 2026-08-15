@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/widgets/safe_refresh_indicator.dart';
 
 import '../../../core/security/security_providers.dart';
@@ -12,6 +13,7 @@ import '../../../core/theme/theme_controller.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../connection/presentation/connection_controller.dart';
 import '../../connection/domain/server_profile.dart';
+import 'about_screen.dart';
 import 'device_data_reset_screen.dart';
 import '../../system/presentation/system_screen.dart' show AppearanceSheet;
 
@@ -276,25 +278,66 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
                 ),
                 const SizedBox(height: 10),
                 Card(
-                  child: SwitchListTile(
-                    key: const ValueKey('anonymous-diagnostics-setting'),
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        key: const ValueKey('anonymous-diagnostics-setting'),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 6,
+                        ),
+                        secondary: const Icon(Icons.monitor_heart_outlined),
+                        title: Text(l10n.diagnosticsAnonymousTitle),
+                        subtitle: Text(
+                          !diagnosticsConfigured
+                              ? l10n.diagnosticsNotConfigured
+                              : diagnostics.isUpdating
+                              ? l10n.diagnosticsSaving
+                              : l10n.diagnosticsAnonymousDescription,
+                        ),
+                        value: diagnostics.enabled,
+                        onChanged:
+                            !diagnostics.isLoaded || diagnostics.isUpdating
+                            ? null
+                            : (value) => _handleDiagnosticsToggle(value),
+                      ),
+                      const Divider(indent: 68, height: 1),
+                      ListTile(
+                        key: const ValueKey('privacy-policy-link'),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 6,
+                        ),
+                        leading: const Icon(Icons.policy_outlined),
+                        title: Text(l10n.diagnosticsPrivacyPolicy),
+                        trailing: const Icon(Icons.open_in_new_rounded),
+                        onTap: () => _openPrivacyPolicy(context),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.navAbout,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 10),
+                Card(
+                  child: ListTile(
+                    key: const ValueKey('about-truedock'),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 6,
                     ),
-                    secondary: const Icon(Icons.monitor_heart_outlined),
-                    title: Text(l10n.diagnosticsAnonymousTitle),
-                    subtitle: Text(
-                      !diagnosticsConfigured
-                          ? l10n.diagnosticsNotConfigured
-                          : diagnostics.isUpdating
-                          ? l10n.diagnosticsSaving
-                          : l10n.diagnosticsAnonymousDescription,
+                    leading: const Icon(Icons.info_outline_rounded),
+                    title: Text(l10n.aboutTitle),
+                    subtitle: Text(l10n.aboutSettingsSubtitle),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const AboutScreen(),
+                      ),
                     ),
-                    value: diagnostics.enabled,
-                    onChanged: !diagnostics.isLoaded || diagnostics.isUpdating
-                        ? null
-                        : (value) => _handleDiagnosticsToggle(value),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -497,6 +540,15 @@ class _AppSettingsScreenState extends ConsumerState<AppSettingsScreen> {
         },
       ) ??
       false;
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    final url = Uri.parse('https://truedock.aroxu.me/privacy-policy');
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } on Object {
+      // Fallback if URL launching fails
+    }
+  }
 }
 
 class TrustedCertificateDetailsSheet extends StatelessWidget {
