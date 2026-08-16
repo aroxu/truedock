@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/destructive_confirmation.dart';
+import '../../../core/widgets/visible_auto_refresh.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../actions/presentation/server_action_controller.dart';
 import '../../connection/presentation/connection_controller.dart';
@@ -24,7 +25,8 @@ class PrivilegesSection extends ConsumerStatefulWidget {
   ConsumerState<PrivilegesSection> createState() => _PrivilegesSectionState();
 }
 
-class _PrivilegesSectionState extends ConsumerState<PrivilegesSection> {
+class _PrivilegesSectionState extends ConsumerState<PrivilegesSection>
+    with VisibleAutoRefreshState<PrivilegesSection> {
   List<Privilege>? _privileges;
   List<PrivilegeRole> _roles = const [];
   String? _error;
@@ -33,18 +35,29 @@ class _PrivilegesSectionState extends ConsumerState<PrivilegesSection> {
   @override
   void initState() {
     super.initState();
+    startVisibleAutoRefresh(
+      () => _load(showLoading: false, includeRoles: false),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _load();
     });
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  Future<void> _load({
+    bool showLoading = true,
+    bool includeRoles = true,
+  }) async {
+    if (_loading && !showLoading) return;
+    if (!showLoading &&
+        ref.read(serverActionControllerProvider).busyKeys.isNotEmpty) {
+      return;
+    }
+    if (showLoading) setState(() => _loading = true);
     final controller = ref.read(serverActionControllerProvider.notifier);
     final privileges = await controller.loadPrivileges();
     // The role catalog is needed to show effective grants, not just the roles
     // literally listed on a privilege.
-    final roles = await controller.loadPrivilegeRoles();
+    final roles = includeRoles ? await controller.loadPrivilegeRoles() : _roles;
     if (!mounted) return;
     setState(() {
       _privileges = privileges;

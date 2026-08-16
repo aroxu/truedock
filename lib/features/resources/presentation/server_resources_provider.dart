@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../core/api/truenas_client_provider.dart';
 import '../../connection/presentation/connection_controller.dart';
@@ -11,15 +12,25 @@ final serverResourcesRepositoryProvider = Provider<ServerResourcesRepository>((
   return ServerResourcesRepository(ref.watch(trueNasClientProvider));
 });
 
+/// Resource subset needed by the destination that is actually on screen.
+///
+/// [ServerResourceScope.all] remains the default for provider-only tools and
+/// tests that load resources without mounting the adaptive shell. The shell
+/// switches this to a narrower scope as soon as it becomes visible.
+final activeServerResourceScopeProvider = StateProvider<ServerResourceScope>(
+  (_) => ServerResourceScope.all,
+);
+
 final serverResourcesProvider = FutureProvider<ServerResources>((ref) async {
   final hasSession = ref.watch(
     connectionControllerProvider.select((state) => state.hasRetainedSession),
   );
   if (!hasSession) return const ServerResources();
   final connection = ref.read(connectionControllerProvider);
+  final scope = ref.watch(activeServerResourceScopeProvider);
   return ref
       .watch(serverResourcesRepositoryProvider)
-      .load(supportedMethods: connection.capabilities?.methods);
+      .load(supportedMethods: connection.capabilities?.methods, scope: scope);
 });
 
 final activeJobsProvider = FutureProvider<ResourceSection<SystemJob>>((

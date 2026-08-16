@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/destructive_confirmation.dart';
+import '../../../core/widgets/visible_auto_refresh.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../actions/presentation/server_action_controller.dart';
 import '../../connection/presentation/connection_controller.dart';
@@ -27,7 +28,8 @@ class CloudBackupSection extends ConsumerStatefulWidget {
   ConsumerState<CloudBackupSection> createState() => _CloudBackupSectionState();
 }
 
-class _CloudBackupSectionState extends ConsumerState<CloudBackupSection> {
+class _CloudBackupSectionState extends ConsumerState<CloudBackupSection>
+    with VisibleAutoRefreshState<CloudBackupSection> {
   List<CloudBackupTask>? _tasks;
   List<CloudCredential> _credentials = const [];
   String? _error;
@@ -36,18 +38,31 @@ class _CloudBackupSectionState extends ConsumerState<CloudBackupSection> {
   @override
   void initState() {
     super.initState();
+    startVisibleAutoRefresh(
+      () => _load(showLoading: false, includeCredentials: false),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _load();
     });
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  Future<void> _load({
+    bool showLoading = true,
+    bool includeCredentials = true,
+  }) async {
+    if (_loading && !showLoading) return;
+    if (!showLoading &&
+        ref.read(serverActionControllerProvider).busyKeys.isNotEmpty) {
+      return;
+    }
+    if (showLoading) setState(() => _loading = true);
     final controller = ref.read(serverActionControllerProvider.notifier);
     final tasks = await controller.loadCloudBackupTasks();
     // Credentials drive both the picker and whether a bucket applies, so they
     // are read alongside rather than on demand inside the sheet.
-    final credentials = await controller.getCloudCredentials();
+    final credentials = includeCredentials
+        ? await controller.getCloudCredentials()
+        : _credentials;
     if (!mounted) return;
     setState(() {
       _tasks = tasks;

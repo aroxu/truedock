@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../apps/presentation/apps_screen.dart';
 import '../../apps/presentation/apps_catalog_provider.dart';
+import '../../actions/presentation/server_action_controller.dart';
 import '../../connection/presentation/connection_controller.dart';
 import '../../data_protection/presentation/data_protection_screen.dart';
 import '../../overview/presentation/overview_screen.dart';
 import '../../reporting/presentation/reporting_provider.dart';
+import '../../resources/domain/server_resources.dart';
 import '../../resources/presentation/server_resources_provider.dart';
 import '../../storage/presentation/storage_screen.dart';
 import '../../system/presentation/system_screen.dart';
@@ -29,7 +31,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   int _index = 0;
   late final AppLifecycleListener _lifecycleListener;
-  Timer? _reportingTimer;
+  Timer? _refreshTimer;
   var _appActive = true;
 
   @override
@@ -45,24 +47,60 @@ class _AppShellState extends ConsumerState<AppShell> {
       onInactive: () => _appActive = false,
       onDetach: () => _appActive = false,
     );
-    _reportingTimer = Timer.periodic(
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(activeServerResourceScopeProvider.notifier).state =
+          ServerResourceScope.overview;
+    });
+    _refreshTimer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) => _refreshLiveReporting(),
+      (_) => _refreshVisibleDestination(),
     );
   }
 
   @override
   void dispose() {
     _lifecycleListener.dispose();
-    _reportingTimer?.cancel();
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
-  void _refreshLiveReporting() {
-    if (!_appActive || _index != 0) return;
+  void _refreshVisibleDestination() {
+    if (!_appActive || !mounted) return;
+    if (ModalRoute.of(context)?.isCurrent == false) return;
     if (!ref.read(connectionControllerProvider).isConnected) return;
-    if (ref.read(overviewReportingProvider).isLoading) return;
-    ref.invalidate(overviewReportingProvider);
+
+    if (_index == 0 && !ref.read(overviewReportingProvider).isLoading) {
+      ref.invalidate(overviewReportingProvider);
+    }
+    final mutationOrReadInFlight = ref
+        .read(serverActionControllerProvider)
+        .busyKeys
+        .isNotEmpty;
+    if (mutationOrReadInFlight) return;
+    if (_index >= 0 &&
+        _index <= 4 &&
+        !ref.read(serverResourcesProvider).isLoading) {
+      ref.invalidate(serverResourcesProvider);
+    }
+    if (_index == 4 && !ref.read(systemResourcesProvider).isLoading) {
+      ref.invalidate(systemResourcesProvider);
+    }
+  }
+
+  void _selectDestination(int value) {
+    setState(() => _index = value);
+    ref
+        .read(activeServerResourceScopeProvider.notifier)
+        .state = switch (value) {
+      0 => ServerResourceScope.overview,
+      1 => ServerResourceScope.storage,
+      2 => ServerResourceScope.protection,
+      3 => ServerResourceScope.apps,
+      4 => ServerResourceScope.system,
+      _ => ServerResourceScope.none,
+    };
+    _refreshVisibleDestination();
   }
 
   /// Data can be minutes or hours old after iOS/Android suspends the app.
@@ -149,8 +187,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       canPop: !isAndroid || _index == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop || !isAndroid || _index == 0) return;
-        setState(() => _index = 0);
-        _refreshLiveReporting();
+        _selectDestination(0);
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -170,10 +207,7 @@ class _AppShellState extends ConsumerState<AppShell> {
               bottomNavigationBar: NavigationBar(
                 selectedIndex: _index,
                 destinations: destinations,
-                onDestinationSelected: (value) {
-                  setState(() => _index = value);
-                  if (value == 0) _refreshLiveReporting();
-                },
+                onDestinationSelected: _selectDestination,
               ),
             );
           }
@@ -192,10 +226,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                           label: Text(destination.label),
                         ),
                     ],
-                    onDestinationSelected: (value) {
-                      setState(() => _index = value);
-                      if (value == 0) _refreshLiveReporting();
-                    },
+                    onDestinationSelected: _selectDestination,
                   ),
                 ),
                 const VerticalDivider(width: 1),

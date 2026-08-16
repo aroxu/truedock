@@ -2,6 +2,21 @@ import '../../../core/domain/data_message.dart';
 
 typedef JsonObject = Map<String, dynamic>;
 
+/// Limits the shared resource snapshot to the destination currently visible.
+///
+/// The complete snapshot fans out across more than twenty middleware methods.
+/// Re-reading all of it every second would waste allocations and API slots for
+/// data the user cannot see, so live refreshes select the relevant subset.
+enum ServerResourceScope {
+  all,
+  none,
+  overview,
+  storage,
+  protection,
+  apps,
+  system,
+}
+
 class ResourceSection<T> {
   const ResourceSection({this.items = const [], this.error});
 

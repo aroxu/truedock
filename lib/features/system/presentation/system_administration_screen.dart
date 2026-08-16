@@ -60,41 +60,67 @@ class SystemAdministrationScreen extends ConsumerStatefulWidget {
 
 class _SystemAdministrationScreenState
     extends ConsumerState<SystemAdministrationScreen> {
-  static const updateRefreshInterval = Duration(seconds: 1);
-  Timer? _updateRefreshTimer;
+  static const refreshInterval = Duration(seconds: 1);
+  late final AppLifecycleListener _lifecycleListener;
+  Timer? _refreshTimer;
+  var _appActive = true;
+  var _visible = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.section == 'updates') {
-      _updateRefreshTimer = Timer.periodic(updateRefreshInterval, (_) {
-        if (mounted && ref.read(connectionControllerProvider).isConnected) {
-          if (ref.read(systemUpdateStatusProvider).isLoading) return;
-          ref.invalidate(systemUpdateStatusProvider);
-        }
-      });
-    }
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () => _appActive = true,
+      onPause: () => _appActive = false,
+      onHide: () => _appActive = false,
+      onInactive: () => _appActive = false,
+      onDetach: () => _appActive = false,
+    );
+    _refreshTimer = Timer.periodic(
+      refreshInterval,
+      (_) => _refreshVisibleSection(),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || widget.onBack != null) return;
+      ref.read(activeServerResourceScopeProvider.notifier).state =
+          ServerResourceScope.system;
+    });
   }
 
   @override
-  void didUpdateWidget(covariant SystemAdministrationScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.section == widget.section) return;
-    _updateRefreshTimer?.cancel();
-    _updateRefreshTimer = widget.section == 'updates'
-        ? Timer.periodic(updateRefreshInterval, (_) {
-            if (mounted && ref.read(connectionControllerProvider).isConnected) {
-              if (ref.read(systemUpdateStatusProvider).isLoading) return;
-              ref.invalidate(systemUpdateStatusProvider);
-            }
-          })
-        : null;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _visible = TickerMode.valuesOf(context).enabled;
   }
 
   @override
   void dispose() {
-    _updateRefreshTimer?.cancel();
+    _refreshTimer?.cancel();
+    _lifecycleListener.dispose();
     super.dispose();
+  }
+
+  void _refreshVisibleSection() {
+    if (!mounted || !_visible || !_appActive) return;
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    if (!ref.read(connectionControllerProvider).isConnected) return;
+    if (ref.read(serverActionControllerProvider).busyKeys.isNotEmpty) return;
+
+    // Inline tablet/landscape sections are refreshed by AppShell's one global
+    // timer. A pushed phone route is no longer covered by that shell route, so
+    // it refreshes the two snapshots it renders here instead.
+    if (widget.onBack == null) {
+      if (!ref.read(systemResourcesProvider).isLoading) {
+        ref.invalidate(systemResourcesProvider);
+      }
+      if (!ref.read(serverResourcesProvider).isLoading) {
+        ref.invalidate(serverResourcesProvider);
+      }
+    }
+    if (widget.section == 'updates' &&
+        !ref.read(systemUpdateStatusProvider).isLoading) {
+      ref.invalidate(systemUpdateStatusProvider);
+    }
   }
 
   @override

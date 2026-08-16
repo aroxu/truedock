@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/destructive_confirmation.dart';
+import '../../../core/widgets/visible_auto_refresh.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../actions/presentation/server_action_controller.dart';
 import '../../connection/presentation/connection_controller.dart';
@@ -23,7 +24,8 @@ class AlertServicesSection extends ConsumerStatefulWidget {
       _AlertServicesSectionState();
 }
 
-class _AlertServicesSectionState extends ConsumerState<AlertServicesSection> {
+class _AlertServicesSectionState extends ConsumerState<AlertServicesSection>
+    with VisibleAutoRefreshState<AlertServicesSection> {
   List<AlertServiceEntry>? _services;
   String? _error;
   var _loading = true;
@@ -31,13 +33,19 @@ class _AlertServicesSectionState extends ConsumerState<AlertServicesSection> {
   @override
   void initState() {
     super.initState();
+    startVisibleAutoRefresh(() => _load(showLoading: false));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _load();
     });
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  Future<void> _load({bool showLoading = true}) async {
+    if (_loading && !showLoading) return;
+    if (!showLoading &&
+        ref.read(serverActionControllerProvider).busyKeys.isNotEmpty) {
+      return;
+    }
+    if (showLoading) setState(() => _loading = true);
     final services = await ref
         .read(serverActionControllerProvider.notifier)
         .loadAlertServices();

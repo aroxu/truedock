@@ -1,6 +1,6 @@
 # TrueDock project status
 
-Snapshot date: 2026-08-14
+Snapshot date: 2026-08-16
 
 This is the concise current-state document. The capability matrix remains the
 method-by-method source of truth; the Phase 5 audit preserves detailed evidence
@@ -10,10 +10,10 @@ and implementation history.
 
 - Flutter Material 3 application for iOS and Android.
 - Application id: `me.aroxu.truedock`.
-- App version: `1.0.0+1`.
+- App version: `1.0.3+6`.
 - Supported server: TrueNAS SCALE Community Edition 25.10 or newer.
 - Transport: JSON-RPC 2.0 over WebSocket at `/api/current`; no REST fallback.
-- Languages: English only.
+- Languages: English and Korean.
 - Default Material source color: `#2E999C`, with presets, custom HEX/color
   picker, light/dark schemes, and optional Android dynamic color.
 
@@ -82,6 +82,12 @@ iOS safe areas, back gestures, keyboard avoidance, and sheets are preserved.
   progress, stage, state, logs, and terminal results update automatically.
   A single reference-counted poller serves every mounted route, so a deep
   navigation stack no longer multiplies `core.get_jobs` traffic.
+- Storage, Data Protection, Apps, System, and reporting-history data refreshes
+  every second only while the corresponding page is visible and the app is in
+  the foreground. The shared server snapshot loads only the active
+  destination's API subset, slow reads never overlap, and automatic refresh is
+  suspended while an editor/modal or server action is active so live data
+  cannot overwrite in-progress input.
 
 ## Administration coverage
 

@@ -45,34 +45,56 @@ class ServerResourcesRepository {
     return section.items.firstOrNull;
   }
 
-  Future<ServerResources> load({Set<String>? supportedMethods}) async {
+  Future<ServerResources> load({
+    Set<String>? supportedMethods,
+    ServerResourceScope scope = ServerResourceScope.all,
+  }) async {
+    final storage =
+        scope == ServerResourceScope.all ||
+        scope == ServerResourceScope.storage;
+    final protection =
+        scope == ServerResourceScope.all ||
+        scope == ServerResourceScope.protection;
+    final apps =
+        scope == ServerResourceScope.all || scope == ServerResourceScope.apps;
+    final overview =
+        scope == ServerResourceScope.all ||
+        scope == ServerResourceScope.overview;
+    final system =
+        scope == ServerResourceScope.all || scope == ServerResourceScope.system;
     final results = await Future.wait<Object>([
-      _section(
+      _sectionWhen(
+        storage,
         'pool.query',
         StoragePool.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage || protection,
         'pool.dataset.query',
         Dataset.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        apps,
         'app.query',
         InstalledApp.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        apps,
         'service.query',
         SystemService.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        overview || system,
         'alert.list',
         SystemAlert.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        overview || protection || system,
         'core.get_jobs',
         SystemJob.fromJson,
         supportedMethods: supportedMethods,
@@ -84,17 +106,20 @@ class ServerResourcesRepository {
           },
         ],
       ),
-      _section(
+      _sectionWhen(
+        protection,
         'replication.query',
         ReplicationTask.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        protection,
         'pool.snapshottask.query',
         SnapshotTask.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'disk.query',
         StorageDisk.fromJson,
         supportedMethods: supportedMethods,
@@ -105,22 +130,26 @@ class ServerResourcesRepository {
           },
         ],
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'sharing.smb.query',
         SmbShare.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'sharing.nfs.query',
         NfsShare.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        apps,
         'vm.query',
         VirtualMachine.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage || protection,
         'pool.snapshot.query',
         SnapshotEntry.fromJson,
         supportedMethods: supportedMethods,
@@ -135,22 +164,26 @@ class ServerResourcesRepository {
           },
         ],
       ),
-      _section(
+      _sectionWhen(
+        protection,
         'pool.scrub.query',
         ScrubTask.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        protection,
         'cloudsync.query',
         CloudSyncTask.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        protection,
         'rsynctask.query',
         RsyncTask.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        apps,
         'container.query',
         ManagedContainer.fromJson,
         supportedMethods: supportedMethods,
@@ -158,42 +191,50 @@ class ServerResourcesRepository {
       // 25.10's Instances surface. Separate from container.query, which that
       // release does not advertise at all: virt.* replaced it, so a 25.10
       // server reaches this section and the container one degrades.
-      _section(
+      _sectionWhen(
+        apps,
         'virt.instance.query',
         VirtInstance.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.target.query',
         IscsiTarget.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.extent.query',
         IscsiExtent.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'sharing.webshare.query',
         WebShare.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.portal.query',
         IscsiPortal.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.initiator.query',
         IscsiInitiator.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.targetextent.query',
         IscsiTargetExtent.fromJson,
         supportedMethods: supportedMethods,
       ),
-      _section(
+      _sectionWhen(
+        storage,
         'iscsi.auth.query',
         IscsiAuth.fromJson,
         supportedMethods: supportedMethods,
@@ -204,10 +245,12 @@ class ServerResourcesRepository {
     // device names to poll, so it cannot join the batch above. A failure here
     // must not degrade the disk list.
     final disks = results[8] as ResourceSection<StorageDisk>;
-    final temperatures = await _diskTemperatures(
-      disks.items.map((disk) => disk.name).toList(growable: false),
-      supportedMethods: supportedMethods,
-    );
+    final temperatures = storage
+        ? await _diskTemperatures(
+            disks.items.map((disk) => disk.name).toList(growable: false),
+            supportedMethods: supportedMethods,
+          )
+        : const DiskTemperatureReport();
 
     return ServerResources(
       pools: results[0] as ResourceSection<StoragePool>,
@@ -236,6 +279,22 @@ class ServerResourcesRepository {
       iscsiTargetExtents: results[23] as ResourceSection<IscsiTargetExtent>,
       iscsiAuths: results[24] as ResourceSection<IscsiAuth>,
       diskTemperatures: temperatures,
+    );
+  }
+
+  Future<ResourceSection<T>> _sectionWhen<T>(
+    bool enabled,
+    String method,
+    T Function(JsonObject json) decode, {
+    List<Object?> params = const [],
+    Set<String>? supportedMethods,
+  }) {
+    if (!enabled) return Future.value(ResourceSection<T>());
+    return _section(
+      method,
+      decode,
+      params: params,
+      supportedMethods: supportedMethods,
     );
   }
 

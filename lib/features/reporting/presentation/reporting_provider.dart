@@ -94,17 +94,57 @@ enum ReportingHistoryRange {
   final Duration duration;
 }
 
+final _reportingHistoryCacheProvider = Provider<_ReportingHistoryCache>((_) {
+  return _ReportingHistoryCache();
+});
+
+class _ReportingHistoryCache {
+  String? serverId;
+  final values = <ReportingHistoryRange, ReportingSnapshot>{};
+
+  void resetFor(String? nextServerId) {
+    if (serverId == nextServerId) return;
+    serverId = nextServerId;
+    values.clear();
+  }
+
+  void clear() {
+    serverId = null;
+    values.clear();
+  }
+}
+
 final reportingHistoryProvider = FutureProvider.autoDispose
     .family<ReportingSnapshot, ReportingHistoryRange>((ref, range) async {
       final connection = ref.watch(connectionControllerProvider);
-      if (!connection.isConnected) return const ReportingSnapshot();
-      return ref
+      final cache = ref.read(_reportingHistoryCacheProvider);
+      if (!connection.isConnected) {
+        cache.clear();
+        return const ReportingSnapshot();
+      }
+      cache.resetFor(connection.profile?.id);
+      final retained = cache.values[range];
+      final latest = retained?.latestSampleTime;
+      final elapsed = latest == null
+          ? null
+          : DateTime.now().toUtc().difference(latest);
+      final window = elapsed == null || elapsed >= range.duration
+          ? range.duration
+          : (elapsed < _overviewTailWindow ? _overviewTailWindow : elapsed);
+      final loaded = await ref
           .watch(reportingRepositoryProvider)
           .loadOverview(
             supportedMethods: connection.capabilities?.methods,
             totalMemoryBytes: connection.systemInfo?.physicalMemoryBytes,
-            window: range.duration,
+            window: window,
           );
+      final merged = window == range.duration
+          ? loaded.retainMissingDevicesFrom(retained)
+          : loaded
+                .appendTo(retained, keep: range.duration)
+                .retainMissingDevicesFrom(retained);
+      if (!merged.hasError && !merged.isEmpty) cache.values[range] = merged;
+      return merged;
     });
 
 void refreshOverviewReporting(WidgetRef ref) {

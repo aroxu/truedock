@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/safe_refresh_indicator.dart';
+import '../../../core/widgets/visible_auto_refresh.dart';
 
 import '../../../core/l10n/data_message_localizations.dart';
 import '../../../core/theme/chart_palette.dart';
@@ -34,9 +35,18 @@ class ReportingHistoryScreen extends ConsumerStatefulWidget {
       _ReportingHistoryScreenState();
 }
 
-class _ReportingHistoryScreenState
-    extends ConsumerState<ReportingHistoryScreen> {
+class _ReportingHistoryScreenState extends ConsumerState<ReportingHistoryScreen>
+    with VisibleAutoRefreshState<ReportingHistoryScreen> {
   var _range = ReportingHistoryRange.day;
+
+  @override
+  void initState() {
+    super.initState();
+    startVisibleAutoRefresh(() {
+      final provider = reportingHistoryProvider(_range);
+      if (!ref.read(provider).isLoading) ref.invalidate(provider);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
