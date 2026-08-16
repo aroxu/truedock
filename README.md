@@ -33,7 +33,7 @@
 <h3 align="center">iOS &amp; iPadOS</h3>
 
 <p align="center">
-  <a href="altstore://source?url=https%3A%2F%2Faltstore.truedock.aroxu.me%2Fapps.json"><img src="https://raw.githubusercontent.com/YTLitePlus/Assets/main/Github/Buttons/Altstore/Altstore.png" width="200" alt="Add TrueDock to AltStore"></a>
+  <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png" width="200" alt="Get it on GitHub"></a>
 </p>
 
 ### Not working? copy and paste this link into AltStore: `https://truedock.aroxu.me/altstore.json`

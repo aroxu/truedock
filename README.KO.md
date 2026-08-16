@@ -33,10 +33,8 @@
 <h3 align="center">iOS 및 iPadOS</h3>
 
 <p align="center">
-  <a href="altstore://source?url=https%3A%2F%2Faltstore.truedock.aroxu.me%2Fapps.json"><img src="https://raw.githubusercontent.com/YTLitePlus/Assets/main/Github/Buttons/Altstore/Altstore.png" width="200" alt="TrueDock을 AltStore에 추가"></a>
+  <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png" width="200" alt="GitHub에서 다운로드"></a>
 </p>
-
-### 위 링크가 작동하지 않나요? AltStore 에서 다음 링크를 추가하세요: `https://truedock.aroxu.me/altstore.json`
 
 <p align="center">
   <a href="#빠른-시작"><strong>시작하기</strong></a>
