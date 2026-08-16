@@ -9,6 +9,7 @@
 #   bash tool/build_android_release.sh
 #   zsh tool/build_android_release.sh --clean
 #   tool/build_android_release.sh --split-per-abi
+#   tool/build_android_release.sh --aab --skip-apk --play
 #
 # Options:
 #   --clean          Run flutter clean before restoring dependencies.
@@ -16,6 +17,8 @@
 #   --split-per-abi  Produce smaller architecture-specific APKs.
 #   --aab            Also build a signed Android App Bundle (.aab) for
 #                     Play Store submission, alongside the APK(s).
+#   --play           Sign with the local Google Play upload key configuration
+#                     in android/play-key.properties. This never changes CI.
 #   --skip-apk       Skip the plain/split APK build. Only useful together
 #                     with --aab, e.g. after a prior invocation already
 #                     produced the APK(s) and only the bundle is missing.
@@ -54,9 +57,10 @@ pub_get=1
 split_per_abi=0
 build_aab=0
 build_apk=1
+play_signing=0
 
 usage() {
-  sed -n '3,22p' "$0"
+  sed -n '3,25p' "$0"
 }
 
 for arg in "$@"; do
@@ -65,6 +69,7 @@ for arg in "$@"; do
     --skip-pub-get) pub_get=0 ;;
     --split-per-abi) split_per_abi=1 ;;
     --aab) build_aab=1 ;;
+    --play) play_signing=1 ;;
     --skip-apk) build_apk=0 ;;
     --help|-h)
       usage
@@ -72,7 +77,7 @@ for arg in "$@"; do
       ;;
     *)
       echo "Unknown argument: $arg" >&2
-      echo "Usage: $0 [--clean] [--skip-pub-get] [--split-per-abi] [--aab] [--skip-apk]" >&2
+      echo "Usage: $0 [--clean] [--skip-pub-get] [--split-per-abi] [--aab] [--play] [--skip-apk]" >&2
       exit 64
       ;;
   esac
@@ -89,9 +94,17 @@ if ! command -v flutter >/dev/null 2>&1; then
 fi
 
 key_properties="$project_dir/android/key.properties"
+if [ "$play_signing" -eq 1 ]; then
+  key_properties="$project_dir/android/play-key.properties"
+  export TRUEDOCK_ANDROID_KEY_PROPERTIES='play-key.properties'
+fi
 if [ ! -f "$key_properties" ]; then
-  echo "Missing android/key.properties." >&2
-  echo "Copy android/key.properties.example and fill in the signing values." >&2
+  echo "Missing ${key_properties#$project_dir/}." >&2
+  if [ "$play_signing" -eq 1 ]; then
+    echo "Create the local Google Play upload signing configuration first." >&2
+  else
+    echo "Copy android/key.properties.example and fill in the signing values." >&2
+  fi
   exit 78
 fi
 

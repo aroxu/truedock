@@ -36,6 +36,8 @@
   <a href="altstore://source?url=https%3A%2F%2Faltstore.truedock.aroxu.me%2Fapps.json"><img src="https://raw.githubusercontent.com/YTLitePlus/Assets/main/Github/Buttons/Altstore/Altstore.png" width="200" alt="TrueDock을 AltStore에 추가"></a>
 </p>
 
+### 위 링크가 작동하지 않나요? AltStore 에서 다음 링크를 추가하세요: `https://truedock.aroxu.me/altstore.json`
+
 <p align="center">
   <a href="#빠른-시작"><strong>시작하기</strong></a>
 </p>
@@ -81,7 +83,7 @@
 
 ## 왜 TrueDock인가요?
 
-|  | TrueDock | 모바일의 TrueNAS 웹 화면 |
+| | TrueDock | 모바일의 TrueNAS 웹 화면 |
 | --- | --- | --- |
 | 인터페이스 | 터치 중심 네이티브 Material 3 UI | 전체 데스크톱 관리 UI |
 | 연결 방식 | TrueNAS 서버에 직접 연결 | TrueNAS 서버에 직접 연결 |

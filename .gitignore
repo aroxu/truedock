@@ -48,3 +48,4 @@ sentry.properties
 
 # Android release signing credentials
 /android/key.properties
+/android/play-key.properties

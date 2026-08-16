@@ -36,6 +36,8 @@
   <a href="altstore://source?url=https%3A%2F%2Faltstore.truedock.aroxu.me%2Fapps.json"><img src="https://raw.githubusercontent.com/YTLitePlus/Assets/main/Github/Buttons/Altstore/Altstore.png" width="200" alt="Add TrueDock to AltStore"></a>
 </p>
 
+### Not working? copy and paste this link into AltStore: `https://truedock.aroxu.me/altstore.json`
+
 <p align="center">
   <a href="docs/support/getting-started.md"><strong>Getting started</strong></a>
 </p>
@@ -81,7 +83,7 @@ For method-level support, see the [capability matrix](docs/api/capability-matrix
 
 ## Why TrueDock?
 
-|  | TrueDock | TrueNAS web interface on mobile |
+| | TrueDock | TrueNAS web interface on mobile |
 | --- | --- | --- |
 | Interface | Native, touch-first Material 3 UI | Full desktop administration UI |
 | Connection | Direct to your TrueNAS server | Direct to your TrueNAS server |

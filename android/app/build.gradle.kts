@@ -7,7 +7,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-val keystorePropertiesFile = rootProject.file("key.properties")
+val keystorePropertiesFile = rootProject.file(
+    System.getenv("TRUEDOCK_ANDROID_KEY_PROPERTIES")
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+        ?: "key.properties",
+)
 val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.isFile) {
         keystorePropertiesFile.inputStream().use(::load)
@@ -33,7 +38,7 @@ fun resolveStoreFile(path: String): File {
 if (releaseBuildRequested) {
     if (!keystorePropertiesFile.isFile) {
         throw GradleException(
-            "Missing android/key.properties. Copy key.properties.example and fill in the signing values.",
+            "Missing Android signing properties: $keystorePropertiesFile",
         )
     }
     val missingProperties = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
