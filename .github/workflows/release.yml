@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*' # Trigger on tags like v1.0.0
+      - "v*" # Trigger on tags like v1.0.0
 
 permissions:
   contents: write
@@ -17,13 +17,13 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
 
       - name: Install dependencies
         run: flutter pub get
@@ -78,7 +78,7 @@ jobs:
           DATE=$(date -u +"%Y-%m-%d")
           SIZE=$(stat -f%z truedock.ipa 2>/dev/null || stat -c%s truedock.ipa)
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/truedock.ipa"
-          
+
           cat <<EOF > apps.json
           {
             "name": "TrueDock",
@@ -94,7 +94,7 @@ jobs:
                 "versionDescription": "Release $VERSION",
                 "downloadURL": "$DOWNLOAD_URL",
                 "size": $SIZE,
-                "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/foreground.svg"
+                "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/icon.png"
               }
             ]
           }
