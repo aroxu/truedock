@@ -30,7 +30,7 @@ class _SystemScreenState extends ConsumerState<SystemScreen> {
     final usesInlineNavigation =
         window.width >= 600 || window.width > window.height;
     final showingInlineSection = _selectedSection != null;
-    final isActiveTab = TickerMode.of(context);
+    final isActiveTab = TickerMode.valuesOf(context).enabled;
 
     return PopScope<Object?>(
       canPop: !isActiveTab || !showingInlineSection,
