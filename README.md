@@ -1,59 +1,151 @@
+<p align="center">
+  <img src=".github/assets/Brand%20Img/AppIcon.png" width="128" height="128" alt="TrueDock icon">
+</p>
 
-# TrueDock
+<h1 align="center">TrueDock</h1>
 
-A mobile administration client for TrueNAS SCALE Community Edition.
+<p align="center">
+  <strong>Dock your TrueNAS.</strong>
+  <br>
+  A mobile-first, open-source administration client for TrueNAS SCALE Community Edition.
+</p>
 
-TrueDock replaces routine use of the TrueNAS web UI on a phone with a focused, responsive native app. Built with Flutter and Material Design 3, it talks directly to your server over its own JSON-RPC API. There is no TrueDock account, no backend service, and no data collected beyond an opt-out anonymous diagnostics preference.
+<p align="center">
+  <a href="README.KO.md">한국어</a> | English
+</p>
 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL_3.0-blue.svg)](LICENSE)
-[![Platform: iOS & Android](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey.svg)]()
-[![TrueNAS: SCALE 25.10+](https://img.shields.io/badge/TrueNAS-SCALE%2025.10%2B-0095D5.svg)](https://www.truenas.com/truenas-scale/)
+<p align="center">
+  <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://img.shields.io/github/v/release/aroxu/truedock?style=flat-square" alt="Latest release"></a>
+  <a href="https://github.com/aroxu/truedock/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/aroxu/truedock/ci.yml?branch=main&amp;style=flat-square" alt="Build status"></a>
+  <a href="https://github.com/aroxu/truedock/releases"><img src="https://img.shields.io/github/downloads/aroxu/truedock/total?style=flat-square" alt="Total downloads"></a>
+  <a href="https://github.com/aroxu/truedock/stargazers"><img src="https://img.shields.io/github/stars/aroxu/truedock?style=flat-square" alt="GitHub stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/aroxu/truedock?style=flat-square" alt="License"></a>
+  <img src="https://img.shields.io/badge/TrueNAS-SCALE%2025.10%2B-0095D5?style=flat-square" alt="TrueNAS SCALE 25.10 or later">
+</p>
 
-## Who is this for?
+<h3 align="center">Android</h3>
 
-- You want to manage your TrueNAS server quickly from your phone without navigating a desktop-optimized web UI.
-- You need to check pools, datasets, and apps status on the go.
-- You want to safely execute critical actions with native confirmation dialogs.
-- You prefer a direct, secure connection to your server without intermediary cloud services.
+<p align="center">
+  <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png" width="200" alt="Get it on GitHub"></a>
+  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22me.aroxu.truedock%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Faroxu%2Ftruedock%22%2C%22author%22%3A%22aroxu%22%2C%22name%22%3A%22TrueDock%22%2C%22overrideSource%22%3A%22GitHub%22%7D"><img src="https://github.com/user-attachments/assets/119e7ff4-2636-43cb-ab7f-1b6a58ac3570" width="200" alt="Get it on Obtainium"></a>
+</p>
 
-## Key Features
+<h3 align="center">iOS &amp; iPadOS</h3>
 
-- **Secure Onboarding & Credentials**: Certificate identity/fingerprint review, API-key or password login, OTP, and multiple profiles.
-- **Biometric & PIN Vault**: "Keep me signed in" backed by Keychain/Keystore, Argon2id + AES-256-GCM PIN vault, and Biometric Unlock.
-- **Live Overview**: Real-time CPU, memory, disk I/O, and network reporting.
-- **Storage Management**: Pools, topology, disks, datasets, zvols, ACLs, quotas, and snapshots.
-- **Data Protection**: Periodic snapshots, replication, Cloud Sync/Backup, Rsync, and scrub scheduling.
-- **Shares**: SMB, NFS, and iSCSI (portals, initiators, targets, extents, LUNs, CHAP).
-- **Apps & VMs**: Catalog browsing, install, upgrade, reconfigure, VM, and standalone container lifecycle control.
-- **System Administration**: Users, groups, privileges, network, alerts, mail, cron jobs, updates, and boot environments.
-- **Safe & Responsive UI**: Consequence-aware confirmations for disruptive actions, English localization, dynamic type, and dark mode.
+<p align="center">
+  <a href="altstore://source?url=https%3A%2F%2Faltstore.truedock.aroxu.me%2Fapps.json"><img src="https://raw.githubusercontent.com/YTLitePlus/Assets/main/Github/Buttons/Altstore/Altstore.png" width="200" alt="Add TrueDock to AltStore"></a>
+</p>
 
-See the [capability matrix](docs/api/capability-matrix.md) for exact method-level coverage, and [project status](docs/project-status.md) for implementation status.
+<p align="center">
+  <a href="docs/support/getting-started.md"><strong>Getting started</strong></a>
+</p>
 
-## Documentation
+<p align="center">
+  <img src=".github/assets/Brand%20Img/Feature%20Image%20-%20EN.png" width="900" alt="TrueDock mobile TrueNAS administration overview">
+</p>
 
-**For Users:**
-- [Getting started](docs/support/getting-started.md) — Requirements, connection setup, certificate approval, and secure sign-in.
-- [Troubleshooting](docs/support/troubleshooting.md) — Common connection, certificate, and feature visibility issues.
+## Highlights
 
-**For Developers:**
-- [Project status](docs/project-status.md) — Current scope, implemented areas, and release readiness.
-- [Release checklist](docs/support/release-checklist.md) — Automated gates, live-server verification, and submission requirements.
-- [Foundation ADR](docs/architecture/0001-foundation.md) & [Phase 5 hardening](docs/architecture/0002-phase5-hardening.md) — Architecture decisions and security reviews.
-- [Anonymous diagnostics](docs/privacy/diagnostics.md) — Sentry data collection details.
+- **Live server overview:** Follow system health, alerts, CPU, memory, network traffic, disk I/O, uptime, and active jobs.
+- **Storage administration:** Manage pools, disks, datasets, Zvols, snapshots, quotas, permissions, and POSIX1E or NFS4 ACLs.
+- **Data protection:** Configure periodic snapshots, replication, cloud tasks, Rsync, and pool scrub schedules.
+- **Apps and workloads:** Browse the catalog, install or reconfigure apps, and control services, virtual machines, and supported containers.
+- **System control:** Manage accounts, networking, shares, updates, boot environments, alerts, mail, cron jobs, and power actions.
+- **Direct and secure:** Connect straight to your NAS over JSON-RPC 2.0 via WSS—without a TrueDock account or intermediary backend.
+- **Protected credentials:** Use Keychain or Keystore, a TrueDock PIN, optional biometric unlock, OTP, and per-server certificate review.
+- **Built for every screen:** Material Design 3, light and dark themes, custom colors, dynamic type, phones, tablets, and adaptive navigation.
 
-## Getting Started (Development)
+For method-level support, see the [capability matrix](docs/api/capability-matrix.md). Current implementation and release readiness are tracked in [project status](docs/project-status.md).
 
-Requirements: A recent [Flutter](https://flutter.dev) stable SDK (`flutter doctor` should be clean), Xcode for iOS, and Android Studio/SDK for Android.
+## Screenshots
+
+<p align="center">
+  <img src=".github/assets/Screenshots/Mobile/EN/Mobile%20-%201.png" width="22%" alt="TrueDock overview on a phone">
+  <img src=".github/assets/Screenshots/Mobile/EN/Mobile%20-%202.png" width="22%" alt="TrueDock storage screen on a phone">
+  <img src=".github/assets/Screenshots/Mobile/EN/Mobile%20-%203.png" width="22%" alt="TrueDock apps screen on a phone">
+  <img src=".github/assets/Screenshots/Mobile/EN/Mobile%20-%204.png" width="22%" alt="TrueDock system screen on a phone">
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src=".github/assets/Screenshots/Tablet/10Inch/EN/10Inch%20Landscape%20Screen%201.png" width="440" alt="TrueDock overview on a tablet"><br>
+      <sub>Adaptive tablet overview</sub>
+    </td>
+    <td align="center">
+      <img src=".github/assets/Screenshots/Tablet/10Inch/EN/10Inch%20Landscape%20Screen%202.png" width="440" alt="TrueDock administration on a tablet"><br>
+      <sub>More room for administration</sub>
+    </td>
+  </tr>
+</table>
+
+## Why TrueDock?
+
+|  | TrueDock | TrueNAS web interface on mobile |
+| --- | --- | --- |
+| Interface | Native, touch-first Material 3 UI | Full desktop administration UI |
+| Connection | Direct to your TrueNAS server | Direct to your TrueNAS server |
+| Mobile security | PIN vault, biometrics, Keychain/Keystore | Browser credential handling |
+| Multiple servers | Saved profiles with authenticated switching | Separate browser sessions |
+| Long-running jobs | Global live job center | Web UI job feedback |
+| Risky actions | Native, consequence-aware confirmations | Web UI confirmations |
+
+The web interface remains the authoritative fallback for newly introduced or unsupported server capabilities. TrueDock checks the connected server's version, methods, and permissions instead of presenting unavailable controls as functional.
+
+## Installation
+
+TrueDock requires **TrueNAS SCALE Community Edition 25.10 or later** and a secure HTTPS/WSS connection to the server.
+
+### Android
+
+1. Open the [latest GitHub release](https://github.com/aroxu/truedock/releases/latest).
+2. Download the APK matching your device. Most current Android devices use `arm64-v8a`.
+3. Allow installation from your browser or file manager when Android asks, then install the APK.
+
+The `.aab` asset is intended for store distribution and cannot be installed directly.
+
+### iOS and iPadOS
+
+1. Tap the **Add to AltStore** badge above to add the TrueDock source, then install TrueDock from AltStore.
+2. Alternatively, download `truedock.ipa` from the [latest GitHub release](https://github.com/aroxu/truedock/releases/latest) and install it with a compatible sideloading tool.
+
+Availability and refresh limits depend on the signing method and Apple account used by your sideloading tool.
+
+## Quick start
+
+1. Launch TrueDock and enter your TrueNAS HTTPS address.
+2. Review the server certificate identity and SHA-256 fingerprint.
+3. Sign in with your username and password, or choose API key authentication. TrueDock continues with OTP when the account requires it.
+4. Optionally enable **Keep me signed in**, a TrueDock PIN, and biometric unlock.
+5. Use the adaptive navigation to open Overview, Storage, Data Protection, Apps, System, or App Settings.
+
+Read the full [Getting Started guide](docs/support/getting-started.md) before approving an unfamiliar certificate or performing destructive operations.
+
+## Privacy
+
+TrueDock connects directly to the server you configure. It has no TrueDock account and no intermediary backend.
+
+Official builds may send anonymous, opt-out crash, error, and sampled performance diagnostics to Sentry. Diagnostics exclude server addresses, resource and account names, certificates, API payloads, credentials, screenshots, and original server error text. Collection can be disabled immediately under **App Settings → Privacy**. Builds without a Sentry DSN send nothing.
+
+See [Anonymous Diagnostics](docs/privacy/diagnostics.md) for the exact collection policy.
+
+## Build from source
+
+### Requirements
+
+- A recent stable [Flutter SDK](https://flutter.dev)
+- Xcode for iOS builds
+- Android Studio or the Android SDK for Android builds
+- A reachable TrueNAS SCALE Community Edition 25.10+ server for live testing
 
 ```bash
+git clone https://github.com/aroxu/truedock.git
+cd truedock
 flutter pub get
 flutter run
 ```
 
-Run against a real TrueNAS SCALE Community Edition 25.10+ server. A disposable VM is recommended for mutation testing.
-
-### Verify your changes
+Before submitting a change:
 
 ```bash
 flutter analyze
@@ -61,18 +153,37 @@ flutter test
 ./tool/release_check.sh
 ```
 
+Use a disposable TrueNAS VM for mutation testing. Never place real server addresses, credentials, API keys, or certificates in source control.
+
+## Tech stack
+
+| Component | Technology |
+| --- | --- |
+| Application | Flutter and Dart |
+| Interface | Material Design 3 with adaptive phone and tablet layouts |
+| State and routing | Riverpod and go_router |
+| TrueNAS transport | JSON-RPC 2.0 over WebSocket Secure |
+| Secure storage | Keychain/Keystore, Argon2id, and AES-256-GCM |
+| Local authentication | Face ID, Touch ID, and Android biometrics |
+| Reporting | Netdata-backed metrics with fl_chart |
+| Diagnostics | Opt-out Sentry crash and sampled performance reporting |
+| Supported server | TrueNAS SCALE Community Edition 25.10+ |
+
 ## Contributing
 
-Contributions are welcome! Before opening a pull request:
+Contributions are welcome. Before opening a pull request:
 
-1. Read [AGENTS.md](AGENTS.md) — it documents the product scope, architecture, security rules, and definition of done.
-2. Keep changes small and add or update tests for behavior changes.
-3. Run the verification steps above before pushing. Localization changes additionally need `python3 tool/arb_lint.py` and `flutter gen-l10n`.
-4. Never commit real credentials, server addresses, certificates, or personal data.
-5. Discuss major architecture or security changes in an issue first.
+1. Read [AGENTS.md](AGENTS.md) for product scope, architecture, security rules, and the definition of done.
+2. Keep changes focused and include tests for changed behavior.
+3. Run the verification commands above.
+4. Open an [issue](https://github.com/aroxu/truedock/issues/new/choose) before proposing a major architecture, security, or product-scope change.
 
-Bug reports should include the TrueNAS server version, whether the signed-in account is an admin, and what you expected versus what happened. Do not include API keys, passwords, encryption passphrases, or full server addresses in an issue or screenshot.
+Bug reports should include the TrueNAS version, relevant permissions, expected behavior, and observed behavior. Reports containing credentials, full server addresses, certificates, or other sensitive information may be removed without notice.
 
-## Privacy
+## License
 
-TrueDock talks **only** to the TrueNAS server you configure. Official builds may send anonymous, opt-out crash/error/performance diagnostics to Sentry (see [Anonymous diagnostics](docs/privacy/diagnostics.md)). Source and local builds send nothing unless a DSN is supplied at build time.
+TrueDock is available under the [GNU General Public License v3.0](LICENSE).
+
+<p align="center">
+  If TrueDock is useful to you, consider starring the repository.
+</p>

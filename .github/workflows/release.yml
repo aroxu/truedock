@@ -94,7 +94,7 @@ jobs:
                 "versionDescription": "Release $VERSION",
                 "downloadURL": "$DOWNLOAD_URL",
                 "size": $SIZE,
-                "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/assets/icon.png"
+                "iconURL": "https://raw.githubusercontent.com/${{ github.repository }}/main/.github/assets/Brand%20Img/AppIcon.png"
               }
             ]
           }
