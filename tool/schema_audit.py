@@ -166,6 +166,11 @@ delegated_findings = []
 for path in sorted(LIB.rglob('*.dart')):
     if path.name.startswith('app_localizations'):
         continue
+    # Job method names are server-provided identifiers translated for display,
+    # not methods TrueDock invokes. Auditing them as call sites makes renamed
+    # historical job names look like unsupported RPC calls.
+    if path.name == 'job_localizations.dart':
+        continue
     text = path.read_text()
     for match in CALL.finditer(text):
         method = match.group(1)
@@ -187,6 +192,8 @@ unadvertised = []
 for path in sorted(LIB.rglob('*.dart')):
     if path.name.startswith('app_localizations'):
         continue
+    if path.name == 'job_localizations.dart':
+        continue
     text = path.read_text()
     for match in CALL.finditer(text):
         method = match.group(1)
@@ -201,6 +208,13 @@ for path in sorted(LIB.rglob('*.dart')):
         # reported. Drop everything from the first `'extra':` onwards.
         scan = window.split("'extra'")[0] if "'extra'" in window else window
         sent = set(KEY.findall(scan))
+        # The authenticated /_upload endpoint embeds an RPC request as
+        # {'method': 'update.file', 'params': [...]}. `params` belongs to the
+        # JSON-RPC envelope; only the object inside it is checked against the
+        # method's accepts schema.
+        prefix = text[max(0, match.start() - 80):match.start()]
+        if re.search(r"'method'\s*:\s*$", prefix):
+            sent.discard('params')
         if not sent:
             continue
         allowed, strict = allowed_keys(method)
