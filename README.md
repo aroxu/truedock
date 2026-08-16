@@ -27,6 +27,7 @@
 
 <p align="center">
   <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png" width="200" alt="Get it on GitHub"></a>
+  <a href="https://play.google.com/store/apps/details?id=me.aroxu.truedock"><img src=".github/assets/google-play-badge.png" width="200" alt="Get it on Google Play"></a>
   <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22me.aroxu.truedock%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Faroxu%2Ftruedock%22%2C%22author%22%3A%22aroxu%22%2C%22name%22%3A%22TrueDock%22%2C%22overrideSource%22%3A%22GitHub%22%7D"><img src="https://github.com/user-attachments/assets/119e7ff4-2636-43cb-ab7f-1b6a58ac3570" width="200" alt="Get it on Obtainium"></a>
 </p>
 
@@ -35,8 +36,6 @@
 <p align="center">
   <a href="https://github.com/aroxu/truedock/releases/latest"><img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png" width="200" alt="Get it on GitHub"></a>
 </p>
-
-### Not working? copy and paste this link into AltStore: `https://truedock.aroxu.me/altstore.json`
 
 <p align="center">
   <a href="docs/support/getting-started.md"><strong>Getting started</strong></a>
