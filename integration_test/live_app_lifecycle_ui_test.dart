@@ -24,6 +24,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:true_dock/app/true_dock_app.dart';
 import 'package:true_dock/features/resources/presentation/server_resources_provider.dart';
 
+import 'adaptive_shell_test_helpers.dart';
+
 const _live = String.fromEnvironment('TRUEDOCK_LIVE');
 const _host = String.fromEnvironment('TRUEDOCK_HOST');
 const _user = String.fromEnvironment('TRUEDOCK_USER');
@@ -52,11 +54,7 @@ void main() {
         await _register(tester);
 
         // Apps is the fourth destination.
-        await _tap(
-          tester,
-          find.byType(NavigationDestination).at(3),
-          seconds: 12,
-        );
+        await _tap(tester, adaptiveDestinationAt(3), seconds: 12);
 
         expect(
           find.textContaining(_app),
@@ -164,7 +162,7 @@ Future<void> _register(WidgetTester tester) async {
 
   final deadline = DateTime.now().add(const Duration(seconds: 90));
   while (DateTime.now().isBefore(deadline)) {
-    if (find.byType(NavigationBar).evaluate().isNotEmpty) return;
+    if (adaptiveShellIsVisible()) return;
     final trust = find.byIcon(Icons.shield_outlined);
     if (trust.evaluate().isNotEmpty) {
       await tester.tap(trust, warnIfMissed: false);

@@ -65,19 +65,68 @@ void main() {
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
     expect(find.text('Edit eno1'), findsOneWidget);
-    expect(find.text('192.168.1.10/24'), findsOneWidget);
     expect(find.textContaining('Interface changes are staged'), findsOneWidget);
+    await _scrollTo(tester, find.text('192.168.1.10/24'));
+    expect(find.text('192.168.1.10/24'), findsOneWidget);
   });
 
-  testWidgets('turning DHCP on hides the static address list', (tester) async {
+  testWidgets('turning DHCP on hides static IPv4 but keeps IPv6 controls', (
+    tester,
+  ) async {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
+    await _scrollTo(tester, find.text('Static addresses'));
     expect(find.text('Static addresses'), findsOneWidget);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.ensureVisible(find.byType(SwitchListTile).first);
     await tester.pumpAndSettle();
-    expect(find.text('Static addresses'), findsNothing);
+    await tester.tap(find.byType(SwitchListTile).first);
+    await tester.pumpAndSettle();
+    await _scrollTo(tester, find.text('Add IPv6 address'));
+    expect(find.text('Static addresses'), findsOneWidget);
     expect(find.text('192.168.1.10/24'), findsNothing);
+    expect(find.text('Add IPv6 address'), findsOneWidget);
+  });
+
+  testWidgets('turning automatic IPv6 on hides and disables manual IPv6', (
+    tester,
+  ) async {
+    _usePhoneSurface(tester);
+    final baseline = _static.copyWith(
+      aliases: const [
+        InterfaceAlias(address: '192.168.1.10', netmask: 24),
+        InterfaceAlias(address: 'fd00::10', netmask: 64, type: 'INET6'),
+      ],
+    );
+    await tester.pumpWidget(_harness(baseline: baseline));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byType(SwitchListTile).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(SwitchListTile).at(1));
+    await tester.pumpAndSettle();
+
+    expect(find.text('fd00::10/64'), findsNothing);
+    await _scrollTo(tester, find.text('Add IPv6 address'));
+    final addIpv6 = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Add IPv6 address'),
+    );
+    expect(addIpv6.onPressed, isNull);
+
+    await tester.tap(find.text('Review'));
+    await tester.pumpAndSettle();
+    await _scrollTo(
+      tester,
+      find.textContaining(
+        'Turning on automatic IPv6 removes the static IPv6 addresses',
+      ),
+    );
+    expect(
+      find.textContaining(
+        'Turning on automatic IPv6 removes the static IPv6 addresses',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('warns when another interface already owns DHCP', (tester) async {
@@ -86,6 +135,7 @@ void main() {
       _harness(baseline: _dhcp, dhcpOwnedByOtherInterface: 'eno1'),
     );
     await tester.pumpAndSettle();
+    await _scrollTo(tester, find.textContaining('eno1 already uses DHCP'));
     expect(find.textContaining('eno1 already uses DHCP'), findsOneWidget);
   });
 
@@ -129,6 +179,7 @@ void main() {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
+    await _scrollTo(tester, find.text('192.168.1.10/24'));
     expect(find.text('192.168.1.10/24'), findsOneWidget);
     final removeIcon = find.byIcon(Icons.remove_circle_outline_rounded);
     await tester.ensureVisible(removeIcon);
@@ -143,8 +194,8 @@ void main() {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
-    await _scrollTo(tester, find.text('Add address'));
-    await tester.tap(find.text('Add address'));
+    await _scrollTo(tester, find.text('Add IPv4 address'));
+    await tester.tap(find.text('Add IPv4 address'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.widgetWithText(TextField, 'Address'),
@@ -161,8 +212,8 @@ void main() {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
-    await _scrollTo(tester, find.text('Add address'));
-    await tester.tap(find.text('Add address'));
+    await _scrollTo(tester, find.text('Add IPv4 address'));
+    await tester.tap(find.text('Add IPv4 address'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.widgetWithText(TextField, 'Address'),
@@ -180,10 +231,8 @@ void main() {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
-    await _scrollTo(tester, find.text('Add address'));
-    await tester.tap(find.text('Add address'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('IPv6'));
+    await _scrollTo(tester, find.text('Add IPv6 address'));
+    await tester.tap(find.text('Add IPv6 address'));
     await tester.pumpAndSettle();
     expect(find.text('64'), findsOneWidget);
     await tester.enterText(
@@ -212,7 +261,7 @@ void main() {
     _usePhoneSurface(tester);
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Review'));
     await tester.pumpAndSettle();
@@ -260,7 +309,7 @@ void main() {
     ).then(completer.complete);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Review'));
     await tester.pumpAndSettle();

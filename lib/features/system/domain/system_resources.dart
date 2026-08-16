@@ -344,6 +344,7 @@ class NetworkInterface {
     required this.linkState,
     required this.addresses,
     required this.dhcp,
+    this.ipv6Auto = false,
     this.activeMediaSubtype,
     this.mtu,
   });
@@ -363,6 +364,7 @@ class NetworkInterface {
           .where((address) => address.address.isNotEmpty)
           .toList(growable: false),
       dhcp: json['ipv4_dhcp'] == true,
+      ipv6Auto: json['ipv6_auto'] == true,
       activeMediaSubtype: _nullableString(state?['active_media_subtype']),
       mtu: _nullableInteger(json['mtu']),
     );
@@ -374,6 +376,7 @@ class NetworkInterface {
   final String linkState;
   final List<NetworkAddress> addresses;
   final bool dhcp;
+  final bool ipv6Auto;
   final String? activeMediaSubtype;
   final int? mtu;
 

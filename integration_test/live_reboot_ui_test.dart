@@ -25,6 +25,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:true_dock/app/true_dock_app.dart';
 import 'package:true_dock/features/connection/presentation/connection_controller.dart';
 
+import 'adaptive_shell_test_helpers.dart';
+
 const _live = String.fromEnvironment('TRUEDOCK_LIVE');
 const _host = String.fromEnvironment('TRUEDOCK_HOST');
 const _user = String.fromEnvironment('TRUEDOCK_USER');
@@ -63,7 +65,7 @@ void main() {
         );
 
         // System is the fifth destination; Updates carries the power controls.
-        await _tap(tester, find.byType(NavigationDestination).at(4));
+        await _tap(tester, adaptiveDestinationAt(4));
         await _tap(tester, find.text('업데이트'), seconds: 10);
 
         await tester.scrollUntilVisible(
@@ -226,7 +228,7 @@ Future<void> _register(WidgetTester tester) async {
 
   final deadline = DateTime.now().add(const Duration(seconds: 90));
   while (DateTime.now().isBefore(deadline)) {
-    if (find.byType(NavigationBar).evaluate().isNotEmpty) return;
+    if (adaptiveShellIsVisible()) return;
     final trust = find.byIcon(Icons.shield_outlined);
     if (trust.evaluate().isNotEmpty) {
       await tester.tap(trust, warnIfMissed: false);

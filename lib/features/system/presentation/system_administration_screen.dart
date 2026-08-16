@@ -44,9 +44,14 @@ import 'system_value_localizations.dart';
 import '../../../core/l10n/data_message_localizations.dart';
 
 class SystemAdministrationScreen extends ConsumerStatefulWidget {
-  const SystemAdministrationScreen({required this.section, super.key});
+  const SystemAdministrationScreen({
+    required this.section,
+    this.onBack,
+    super.key,
+  });
 
   final String section;
+  final VoidCallback? onBack;
 
   @override
   ConsumerState<SystemAdministrationScreen> createState() =>
@@ -121,7 +126,17 @@ class _SystemAdministrationScreenState
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverAppBar(title: Text(definition.title)),
+            SliverAppBar(
+              automaticallyImplyLeading: widget.onBack == null,
+              leading: widget.onBack == null
+                  ? null
+                  : IconButton(
+                      onPressed: widget.onBack,
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      tooltip: l10n.actionBack,
+                    ),
+              title: Text(definition.title),
+            ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
               sliver: !connected
@@ -1561,7 +1576,15 @@ class _SystemAdministrationScreenState
       );
       return;
     }
-    final losesStatic = baseline.aliases.isNotEmpty && next.ipv4Dhcp;
+    final losesStatic =
+        baseline.aliases.any((alias) => !alias.isIpv6) && next.ipv4Dhcp;
+    final losesStaticIpv6 =
+        baseline.aliases.any((alias) => alias.isIpv6) &&
+        next.ipv6Auto &&
+        !baseline.ipv6Auto;
+    final staticIpv4Aliases = next.activeAliases
+        .where((alias) => !alias.isIpv6)
+        .toList(growable: false);
     final confirmed = await confirmDestructiveAction(
       context,
       title: l10n.sysStageInterfaceTitle(item.name),
@@ -1576,14 +1599,25 @@ class _SystemAdministrationScreenState
               ? l10n.sysInterfaceDhcpConsequence(item.name)
               : l10n.sysInterfaceStaticConsequence(
                   item.name,
-                  next.aliases.length,
-                  next.aliases.map((a) => a.label).join(', '),
+                  staticIpv4Aliases.length,
+                  staticIpv4Aliases.map((a) => a.label).join(', '),
                 ),
+        ),
+        ImpactDetail(
+          icon: Icons.looks_6_outlined,
+          text: next.ipv6Auto
+              ? l10n.sysInterfaceIpv6AutoEnabledConsequence(item.name)
+              : l10n.sysInterfaceIpv6AutoDisabledConsequence(item.name),
         ),
         if (losesStatic)
           ImpactDetail(
             icon: Icons.link_off_rounded,
             text: l10n.sysInterfaceLosesStatic,
+          ),
+        if (losesStaticIpv6)
+          ImpactDetail(
+            icon: Icons.link_off_rounded,
+            text: l10n.sysInterfaceIpv6AutoLosesStatic,
           ),
         ImpactDetail(
           icon: Icons.bolt_rounded,
@@ -2592,6 +2626,7 @@ class _InterfaceCard extends StatelessWidget {
                       item.activeMediaSubtype!,
                     if (item.mtu != null) l10n.sysInterfaceMtu('${item.mtu}'),
                     if (item.dhcp) l10n.sysInterfaceDhcp,
+                    if (item.ipv6Auto) l10n.sysInterfaceIpv6AutoShort,
                   ].join(' · '),
                   style: TextStyle(color: colors.onSurfaceVariant),
                 ),

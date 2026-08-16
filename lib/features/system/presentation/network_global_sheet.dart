@@ -13,6 +13,7 @@ String networkValidationMessage(
   NetworkValidationCode.hostnameInvalid => l10n.sysNetValidationHostnameInvalid,
   NetworkValidationCode.domainInvalid => l10n.sysNetValidationDomain,
   NetworkValidationCode.gatewayInvalid => l10n.sysNetValidationGateway,
+  NetworkValidationCode.ipv6GatewayInvalid => l10n.sysNetValidationIpv6Gateway,
   NetworkValidationCode.nameserverInvalid => l10n.sysNetValidationNameserver,
   NetworkValidationCode.proxyInvalid => l10n.sysNetValidationProxy,
 };
@@ -41,6 +42,7 @@ class _NetworkGlobalSheetState extends State<NetworkGlobalSheet> {
   late final TextEditingController _hostname;
   late final TextEditingController _domain;
   late final TextEditingController _gateway;
+  late final TextEditingController _ipv6Gateway;
   late final TextEditingController _nameserver1;
   late final TextEditingController _nameserver2;
   late final TextEditingController _nameserver3;
@@ -54,6 +56,7 @@ class _NetworkGlobalSheetState extends State<NetworkGlobalSheet> {
     _hostname = TextEditingController(text: baseline.hostname);
     _domain = TextEditingController(text: baseline.domain);
     _gateway = TextEditingController(text: baseline.ipv4Gateway);
+    _ipv6Gateway = TextEditingController(text: baseline.ipv6Gateway);
     _nameserver1 = TextEditingController(text: baseline.nameserver1);
     _nameserver2 = TextEditingController(text: baseline.nameserver2);
     _nameserver3 = TextEditingController(text: baseline.nameserver3);
@@ -65,6 +68,7 @@ class _NetworkGlobalSheetState extends State<NetworkGlobalSheet> {
     _hostname.dispose();
     _domain.dispose();
     _gateway.dispose();
+    _ipv6Gateway.dispose();
     _nameserver1.dispose();
     _nameserver2.dispose();
     _nameserver3.dispose();
@@ -143,6 +147,20 @@ class _NetworkGlobalSheetState extends State<NetworkGlobalSheet> {
                     l10n,
                     baseline.ipv4Gateway,
                     baseline.effective.ipv4Gateway,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _ipv6Gateway,
+                autocorrect: false,
+                keyboardType: TextInputType.url,
+                decoration: InputDecoration(
+                  labelText: l10n.sysNetIpv6Gateway,
+                  helperText: _effectiveHint(
+                    l10n,
+                    baseline.ipv6Gateway,
+                    baseline.effective.ipv6Gateway,
                   ),
                 ),
               ),
@@ -252,6 +270,7 @@ class _NetworkGlobalSheetState extends State<NetworkGlobalSheet> {
       hostname: _hostname.text.trim(),
       domain: _domain.text.trim(),
       ipv4Gateway: _gateway.text.trim(),
+      ipv6Gateway: _ipv6Gateway.text.trim(),
       nameserver1: _nameserver1.text.trim(),
       nameserver2: _nameserver2.text.trim(),
       nameserver3: _nameserver3.text.trim(),

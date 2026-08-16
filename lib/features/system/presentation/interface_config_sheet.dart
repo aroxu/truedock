@@ -57,20 +57,24 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
 
   void _syncConfiguration() {
     final mtuText = _mtuController.text.trim();
+    final parsedMtu = int.tryParse(mtuText);
     _configuration = _configuration.copyWith(
       description: _descriptionController.text.trim(),
-      mtu: int.tryParse(mtuText),
-      clearMtu: mtuText.isEmpty,
+      mtu: mtuText.isEmpty ? widget.baseline.mtu : (parsedMtu ?? 0),
     );
   }
 
-  Future<void> _addAlias() async {
+  Future<void> _addAlias({required bool ipv6}) async {
     final alias = await showModalBottomSheet<InterfaceAlias>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (sheetContext) => const _AliasEditorSheet(),
+      builder: (sheetContext) => _AliasEditorSheet(
+        initialIpv6: ipv6,
+        allowIpv4: !_configuration.ipv4Dhcp,
+        allowIpv6: !_configuration.ipv6Auto,
+      ),
     );
     if (alias == null) return;
     setState(() {
@@ -86,8 +90,13 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (sheetContext) =>
-          _AliasEditorSheet(existing: _configuration.aliases[index]),
+      builder: (sheetContext) => _AliasEditorSheet(
+        existing: _configuration.aliases[index],
+        allowIpv4:
+            !_configuration.ipv4Dhcp || !_configuration.aliases[index].isIpv6,
+        allowIpv6:
+            !_configuration.ipv6Auto || _configuration.aliases[index].isIpv6,
+      ),
     );
     if (alias == null) return;
     final aliases = [..._configuration.aliases];
@@ -187,6 +196,13 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
 
   Widget _form(ThemeData theme, AppLocalizations l10n) {
     final dhcpOwner = widget.dhcpOwnedByOtherInterface;
+    final visibleAliases = _configuration.aliases.indexed
+        .where(
+          (entry) => entry.$2.isIpv6
+              ? !_configuration.ipv6Auto
+              : !_configuration.ipv4Dhcp,
+        )
+        .toList(growable: false);
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
@@ -218,6 +234,15 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
             () => _configuration = _configuration.copyWith(ipv4Dhcp: value),
           ),
         ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.sysInterfaceUseIpv6AutoTitle),
+          subtitle: Text(l10n.sysInterfaceUseIpv6AutoSubtitle),
+          value: _configuration.ipv6Auto,
+          onChanged: (value) => setState(
+            () => _configuration = _configuration.copyWith(ipv6Auto: value),
+          ),
+        ),
         if (_configuration.ipv4Dhcp && dhcpOwner != null) ...[
           const SizedBox(height: 8),
           _Notice(
@@ -225,38 +250,48 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
             message: l10n.sysInterfaceDhcpConflict(dhcpOwner),
           ),
         ],
-        if (!_configuration.ipv4Dhcp) ...[
-          const SizedBox(height: 12),
-          Text(l10n.sysInterfaceStaticTitle, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
-          if (_configuration.aliases.isEmpty)
-            Text(l10n.sysInterfaceNoStatic)
-          else
-            for (final (index, alias) in _configuration.aliases.indexed) ...[
-              if (index > 0) const SizedBox(height: 6),
-              _AliasRow(
-                alias: alias,
-                onEdit: () => _editAlias(index),
-                onRemove: () => _removeAlias(index),
-              ),
-            ],
-          if (_errors['aliases'] != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              l10n.interfaceValidationMessage(_errors['aliases']!),
-              style: TextStyle(color: theme.colorScheme.error),
+        const SizedBox(height: 12),
+        Text(l10n.sysInterfaceStaticTitle, style: theme.textTheme.titleSmall),
+        const SizedBox(height: 8),
+        if (visibleAliases.isEmpty)
+          Text(l10n.sysInterfaceNoStatic)
+        else
+          for (final (visibleIndex, entry) in visibleAliases.indexed) ...[
+            if (visibleIndex > 0) const SizedBox(height: 6),
+            _AliasRow(
+              alias: entry.$2,
+              onEdit: () => _editAlias(entry.$1),
+              onRemove: () => _removeAlias(entry.$1),
             ),
           ],
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _addAlias,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.sysInterfaceAddAddress),
-            ),
+        if (_errors['aliases'] != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            l10n.interfaceValidationMessage(_errors['aliases']!),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
         ],
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            TextButton.icon(
+              onPressed: _configuration.ipv4Dhcp
+                  ? null
+                  : () => _addAlias(ipv6: false),
+              icon: const Icon(Icons.looks_4_outlined),
+              label: Text(l10n.sysInterfaceAddIpv4Address),
+            ),
+            TextButton.icon(
+              onPressed: _configuration.ipv6Auto
+                  ? null
+                  : () => _addAlias(ipv6: true),
+              icon: const Icon(Icons.looks_6_outlined),
+              label: Text(l10n.sysInterfaceAddIpv6Address),
+            ),
+          ],
+        ),
         const SizedBox(height: 18),
         TextField(
           controller: _mtuController,
@@ -278,9 +313,18 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
     _syncConfiguration();
     final changed = _configuration.differsFrom(widget.baseline);
     final losesStatic =
-        widget.baseline.aliases.isNotEmpty &&
+        widget.baseline.aliases.any((alias) => !alias.isIpv6) &&
         _configuration.ipv4Dhcp &&
         !widget.baseline.ipv4Dhcp;
+    final losesStaticIpv6 =
+        widget.baseline.aliases.any((alias) => alias.isIpv6) &&
+        _configuration.ipv6Auto &&
+        !widget.baseline.ipv6Auto;
+    final visibleAddresses = <String>[
+      if (_configuration.ipv4Dhcp) l10n.sysInterfaceReviewAssignedByDhcp,
+      for (final alias in _configuration.activeAliases) alias.label,
+    ];
+    final hasStaticIpv6 = _configuration.aliases.any((alias) => alias.isIpv6);
     return ListView(
       children: [
         Container(
@@ -309,14 +353,18 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
                     : l10n.sysInterfaceReviewStatic,
               ),
               _ReviewRow(
+                label: l10n.sysInterfaceReviewIpv6,
+                value: _configuration.ipv6Auto
+                    ? l10n.sysInterfaceReviewAutomatic
+                    : hasStaticIpv6
+                    ? l10n.sysInterfaceReviewStatic
+                    : l10n.sysInterfaceReviewDisabled,
+              ),
+              _ReviewRow(
                 label: l10n.sysInterfaceReviewAddresses,
-                value: _configuration.ipv4Dhcp
-                    ? l10n.sysInterfaceReviewAssignedByDhcp
-                    : (_configuration.aliases.isEmpty
-                          ? l10n.sysInterfaceReviewNone
-                          : _configuration.aliases
-                                .map((alias) => alias.label)
-                                .join('\n')),
+                value: visibleAddresses.isEmpty
+                    ? l10n.sysInterfaceReviewNone
+                    : visibleAddresses.join('\n'),
               ),
               _ReviewRow(
                 label: l10n.sysInterfaceReviewMtu,
@@ -343,6 +391,13 @@ class _InterfaceConfigSheetState extends State<InterfaceConfigSheet> {
             _Notice(
               icon: Icons.link_off_rounded,
               message: l10n.sysInterfaceDhcpLosesRoute,
+            ),
+          ],
+          if (losesStaticIpv6) ...[
+            const SizedBox(height: 12),
+            _Notice(
+              icon: Icons.link_off_rounded,
+              message: l10n.sysInterfaceIpv6AutoLosesStatic,
             ),
           ],
         ],
@@ -415,9 +470,17 @@ class _AliasRow extends StatelessWidget {
 
 /// Collects a single address/prefix pair.
 class _AliasEditorSheet extends StatefulWidget {
-  const _AliasEditorSheet({this.existing});
+  const _AliasEditorSheet({
+    this.existing,
+    this.initialIpv6 = false,
+    this.allowIpv4 = true,
+    this.allowIpv6 = true,
+  });
 
   final InterfaceAlias? existing;
+  final bool initialIpv6;
+  final bool allowIpv4;
+  final bool allowIpv6;
 
   @override
   State<_AliasEditorSheet> createState() => _AliasEditorSheetState();
@@ -432,13 +495,13 @@ class _AliasEditorSheetState extends State<_AliasEditorSheet> {
   @override
   void initState() {
     super.initState();
+    _ipv6 = widget.existing?.isIpv6 ?? widget.initialIpv6;
     _addressController = TextEditingController(
       text: widget.existing?.address ?? '',
     );
     _netmaskController = TextEditingController(
-      text: widget.existing?.netmask.toString() ?? '24',
+      text: widget.existing?.netmask.toString() ?? (_ipv6 ? '64' : '24'),
     );
-    _ipv6 = widget.existing?.isIpv6 ?? false;
   }
 
   @override
@@ -513,14 +576,16 @@ class _AliasEditorSheetState extends State<_AliasEditorSheet> {
             const SizedBox(height: 16),
             SegmentedButton<bool>(
               segments: [
-                ButtonSegment(
-                  value: false,
-                  label: Text(l10n.sysInterfaceIpv4Label),
-                ),
-                ButtonSegment(
-                  value: true,
-                  label: Text(l10n.sysInterfaceIpv6Label),
-                ),
+                if (widget.allowIpv4 || widget.existing?.isIpv6 == false)
+                  ButtonSegment(
+                    value: false,
+                    label: Text(l10n.sysInterfaceIpv4Label),
+                  ),
+                if (widget.allowIpv6 || widget.existing?.isIpv6 == true)
+                  ButtonSegment(
+                    value: true,
+                    label: Text(l10n.sysInterfaceIpv6Label),
+                  ),
               ],
               selected: {_ipv6},
               showSelectedIcon: false,

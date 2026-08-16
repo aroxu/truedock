@@ -25,6 +25,8 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
+  static const _navigationRailBreakpoint = 600.0;
+
   int _index = 0;
   late final AppLifecycleListener _lifecycleListener;
   Timer? _reportingTimer;
@@ -152,11 +154,16 @@ class _AppShellState extends ConsumerState<AppShell> {
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final useRail = constraints.maxWidth >= 840;
+          // Material 3 classifies windows below 600dp as compact. Tablets at
+          // 600dp and above get a rail in both orientations, while phones
+          // retain the familiar bottom navigation bar.
+          final useRail = constraints.maxWidth >= _navigationRailBreakpoint;
           // The connection-lost banner is mounted app-wide by
           // `ConnectionLostHost`, above the router, so it also covers the
           // routes pushed on top of this shell.
-          final content = SlidingIndexedStack(index: _index, children: screens);
+          final content = _ReadableWidth(
+            child: SlidingIndexedStack(index: _index, children: screens),
+          );
           if (!useRail) {
             return Scaffold(
               body: content,
@@ -177,14 +184,6 @@ class _AppShellState extends ConsumerState<AppShell> {
                 SafeArea(
                   child: NavigationRail(
                     selectedIndex: _index,
-                    leading: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      child: Icon(
-                        Icons.dock_rounded,
-                        size: 34,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
                     destinations: [
                       for (final destination in destinations)
                         NavigationRailDestination(
@@ -208,4 +207,29 @@ class _AppShellState extends ConsumerState<AppShell> {
       ),
     );
   }
+}
+
+/// Caps how wide the destination content may grow.
+///
+/// Tablets give the app far more horizontal room than a phone, but running
+/// dense administrative lists across a full 1280dp window makes rows hard to
+/// scan and reads as a stretched phone layout. Centring the content inside a
+/// comfortable measure keeps the extra space as margin instead.
+class _ReadableWidth extends StatelessWidget {
+  const _ReadableWidth({required this.child});
+
+  /// Chosen so a 10\" tablet in landscape keeps dense administrative content
+  /// easy to scan, while smaller windows remain unaffected.
+  static const maxContentWidth = 840.0;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: maxContentWidth),
+      child: child,
+    ),
+  );
 }

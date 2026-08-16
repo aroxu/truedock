@@ -60,8 +60,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionConnectServer => 'Connect server';
 
   @override
+  String get actionNext => 'Next';
+
+  @override
   String authSucceededSigningIn(String serverName) {
-    return 'Authentication successful. Signing in to $serverName…';
+    return 'Signing in to $serverName…';
   }
 
   @override
@@ -264,14 +267,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectServerNameHint => 'Home NAS';
 
   @override
-  String get connectSecureAddress => 'Secure address';
+  String get connectSecureAddress => 'TrueNAS Server Address';
 
   @override
   String get connectSecureAddressHint => 'https://truenas.local';
-
-  @override
-  String get connectSecureAddressHelper =>
-      'TrueDock connects to WSS /api/current.';
 
   @override
   String get connectSignInWith => 'Sign in with';
@@ -6463,7 +6462,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sysNetGlobalSubtitle =>
-      'Hostname, domain, default gateway, nameservers';
+      'Hostname, domain, IPv4/IPv6 gateways, nameservers';
 
   @override
   String get sysNetGlobalEdit => 'Edit DNS and gateway';
@@ -6489,6 +6488,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sysNetGateway => 'IPv4 default gateway';
+
+  @override
+  String get sysNetIpv6Gateway => 'IPv6 default gateway';
 
   @override
   String sysNetNameserver(int index) {
@@ -6542,6 +6544,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sysNetValidationGateway =>
       'Enter a valid IPv4 address, or leave empty to clear it.';
+
+  @override
+  String get sysNetValidationIpv6Gateway =>
+      'Enter a valid IPv6 address, or leave empty to clear it.';
 
   @override
   String get sysNetValidationNameserver =>
@@ -7700,7 +7706,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sysInterfaceUseDhcpSubtitle =>
-      'Static addresses are ignored while DHCP is on.';
+      'Static IPv4 addresses are ignored while DHCP is on.';
+
+  @override
+  String get sysInterfaceUseIpv6AutoTitle => 'Configure IPv6 automatically';
+
+  @override
+  String get sysInterfaceUseIpv6AutoSubtitle =>
+      'Accept IPv6 router advertisements for automatic addressing.';
+
+  @override
+  String get sysInterfaceIpv6AutoShort => 'IPv6 automatic';
 
   @override
   String sysInterfaceDhcpConflict(String owner) {
@@ -7717,10 +7733,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sysInterfaceAddAddress => 'Add address';
 
   @override
+  String get sysInterfaceAddIpv4Address => 'Add IPv4 address';
+
+  @override
+  String get sysInterfaceAddIpv6Address => 'Add IPv6 address';
+
+  @override
   String get sysInterfaceMtuLabel => 'MTU (optional)';
 
   @override
-  String get sysInterfaceMtuHelper => 'Leave blank for the default (1500).';
+  String get sysInterfaceMtuHelper => 'Leave blank to keep the current value.';
 
   @override
   String get sysInterfaceReviewInterface => 'Interface';
@@ -7730,6 +7752,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sysInterfaceReviewIpv4 => 'IPv4';
+
+  @override
+  String get sysInterfaceReviewIpv6 => 'IPv6';
+
+  @override
+  String get sysInterfaceReviewAutomatic => 'Automatic';
+
+  @override
+  String get sysInterfaceReviewDisabled => 'Disabled';
 
   @override
   String get sysInterfaceReviewAddresses => 'Addresses';
@@ -7750,7 +7781,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sysInterfaceReviewNone => 'None';
 
   @override
-  String get sysInterfaceReviewMtuDefault => 'Default (1500)';
+  String get sysInterfaceReviewMtuDefault => 'Unchanged';
 
   @override
   String get sysInterfaceNothingChanged =>
@@ -7759,6 +7790,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sysInterfaceSessionDrop =>
       'Changing the address of the interface TrueDock is connected through will drop this session when you commit. The server rolls the change back automatically if the check-in does not arrive.';
+
+  @override
+  String sysInterfaceIpv6AutoEnabledConsequence(String name) {
+    return '$name will configure IPv6 automatically from router advertisements.';
+  }
+
+  @override
+  String sysInterfaceIpv6AutoDisabledConsequence(String name) {
+    return '$name will stop automatic IPv6 configuration. Add a static IPv6 address if this interface still needs IPv6 connectivity.';
+  }
+
+  @override
+  String get sysInterfaceIpv6AutoLosesStatic =>
+      'Turning on automatic IPv6 removes the static IPv6 addresses on this interface.';
 
   @override
   String get sysInterfaceDhcpLosesRoute =>

@@ -5,18 +5,84 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/widgets/safe_refresh_indicator.dart';
 
+import '../../../core/theme/app_motion.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../connection/presentation/connection_controller.dart';
 import '../../resources/presentation/server_resources_provider.dart';
+import 'system_administration_screen.dart';
 import 'system_resources_provider.dart';
 
-class SystemScreen extends ConsumerWidget {
+class SystemScreen extends ConsumerStatefulWidget {
   const SystemScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SystemScreen> createState() => _SystemScreenState();
+}
+
+class _SystemScreenState extends ConsumerState<SystemScreen> {
+  String? _selectedSection;
+
+  @override
+  Widget build(BuildContext context) {
+    final window = MediaQuery.sizeOf(context);
+    final usesInlineNavigation =
+        window.width >= 600 || window.width > window.height;
+    final showingInlineSection = _selectedSection != null;
+    final isActiveTab = TickerMode.of(context);
+
+    return PopScope<Object?>(
+      canPop: !isActiveTab || !showingInlineSection,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && isActiveTab && showingInlineSection) {
+          _showMenu();
+        }
+      },
+      child: ClipRect(
+        child: AnimatedSwitcher(
+          duration: context.motionDuration(AppMotion.emphasized),
+          switchInCurve: AppMotion.standardCurve,
+          switchOutCurve: AppMotion.exitCurve,
+          transitionBuilder: (child, animation) {
+            final openingSection =
+                child.key is ValueKey<String> &&
+                (child.key! as ValueKey<String>).value.startsWith(
+                  'system-inline-section-',
+                );
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: Offset(openingSection ? 0.16 : -0.16, 0),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: AppMotion.standardCurve,
+                      ),
+                    ),
+                child: child,
+              ),
+            );
+          },
+          child: showingInlineSection
+              ? SystemAdministrationScreen(
+                  key: ValueKey('system-inline-section-$_selectedSection'),
+                  section: _selectedSection!,
+                  onBack: _showMenu,
+                )
+              : KeyedSubtree(
+                  key: const ValueKey('system-menu'),
+                  child: _buildMenu(context, usesInlineNavigation),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenu(BuildContext context, bool usesInlineNavigation) {
     final l10n = AppLocalizations.of(context);
     final connection = ref.watch(connectionControllerProvider);
     return SafeRefreshIndicator(
@@ -56,35 +122,52 @@ class SystemScreen extends ConsumerWidget {
                         title: l10n.systemGeneralSettings,
                         subtitle: l10n.systemGeneralSettingsSubtitle,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/general'),
+                        onTap: () => _openSection(
+                          context,
+                          'general',
+                          usesInlineNavigation,
+                        ),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
                         icon: Icons.notifications_outlined,
                         title: l10n.systemAlertsAndJobs,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/activity'),
+                        onTap: () => _openSection(
+                          context,
+                          'activity',
+                          usesInlineNavigation,
+                        ),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
                         icon: Icons.people_outline_rounded,
                         title: l10n.systemUsersAndAccess,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/accounts'),
+                        onTap: () => _openSection(
+                          context,
+                          'accounts',
+                          usesInlineNavigation,
+                        ),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
                         icon: Icons.lan_outlined,
                         title: l10n.systemNetwork,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/network'),
+                        onTap: () => _openSection(
+                          context,
+                          'network',
+                          usesInlineNavigation,
+                        ),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
                         icon: Icons.schedule_rounded,
                         title: l10n.sysCronTitle,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/cron'),
+                        onTap: () =>
+                            _openSection(context, 'cron', usesInlineNavigation),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
@@ -93,7 +176,11 @@ class SystemScreen extends ConsumerWidget {
                         title: l10n.systemAdvanced,
                         subtitle: l10n.systemAdvancedSubtitle,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/advanced'),
+                        onTap: () => _openSection(
+                          context,
+                          'advanced',
+                          usesInlineNavigation,
+                        ),
                       ),
                       const Divider(indent: 68, height: 1),
                       _AdminTile(
@@ -101,7 +188,11 @@ class SystemScreen extends ConsumerWidget {
                         icon: Icons.system_update_alt_rounded,
                         title: l10n.systemUpdates,
                         enabled: connection.isConnected,
-                        onTap: () => context.push('/system/updates'),
+                        onTap: () => _openSection(
+                          context,
+                          'updates',
+                          usesInlineNavigation,
+                        ),
                       ),
                     ],
                   ),
@@ -113,6 +204,20 @@ class SystemScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _openSection(
+    BuildContext context,
+    String section,
+    bool usesInlineNavigation,
+  ) {
+    if (!usesInlineNavigation) {
+      context.push('/system/$section');
+      return;
+    }
+    setState(() => _selectedSection = section);
+  }
+
+  void _showMenu() => setState(() => _selectedSection = null);
 }
 
 class _AdminTile extends StatelessWidget {

@@ -63,28 +63,32 @@ class _SlidingIndexedStackState extends State<SlidingIndexedStack>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, _) => Stack(
-        fit: StackFit.expand,
-        children: [
-          for (final (childIndex, child) in widget.children.indexed)
-            Offstage(
-              offstage:
-                  childIndex != widget.index && childIndex != _outgoingIndex,
-              child: TickerMode(
-                enabled: childIndex == widget.index,
-                child: ExcludeSemantics(
-                  excluding: childIndex != widget.index,
-                  child: IgnorePointer(
-                    ignoring: childIndex != widget.index,
-                    child: FractionalTranslation(
-                      translation: _translationFor(childIndex),
-                      child: child,
+      builder: (context, _) => ClipRect(
+        clipBehavior: Clip.hardEdge,
+        child: Stack(
+          fit: StackFit.expand,
+          clipBehavior: Clip.hardEdge,
+          children: [
+            for (final (childIndex, child) in widget.children.indexed)
+              Offstage(
+                offstage:
+                    childIndex != widget.index && childIndex != _outgoingIndex,
+                child: TickerMode(
+                  enabled: childIndex == widget.index,
+                  child: ExcludeSemantics(
+                    excluding: childIndex != widget.index,
+                    child: IgnorePointer(
+                      ignoring: childIndex != widget.index,
+                      child: FractionalTranslation(
+                        translation: _translationFor(childIndex),
+                        child: RepaintBoundary(child: child),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

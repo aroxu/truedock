@@ -417,7 +417,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.text('인증 성공. nas에 로그인 중…'), findsOneWidget);
+    expect(find.text('nas에 로그인 중…'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('authenticated-signing-in')),
       findsOneWidget,
@@ -444,7 +444,7 @@ void main() {
 
     await _openSavedServer(tester);
 
-    expect(find.text('인증 성공. nas에 로그인 중…'), findsOneWidget);
+    expect(find.text('nas에 로그인 중…'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('authenticated-signing-in')),
       findsOneWidget,

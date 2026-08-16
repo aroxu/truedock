@@ -28,6 +28,8 @@ import 'package:true_dock/features/system/presentation/system_general_sheet.dart
 import 'package:true_dock/features/storage/presentation/dataset_acl_sheet.dart';
 import 'package:true_dock/features/reporting/presentation/reporting_history_screen.dart';
 
+import 'adaptive_shell_test_helpers.dart';
+
 const _live = String.fromEnvironment('TRUEDOCK_LIVE');
 const _host = String.fromEnvironment('TRUEDOCK_HOST');
 const _user = String.fromEnvironment('TRUEDOCK_USER');
@@ -102,8 +104,8 @@ void main() {
         // Overview must show live data, and no destination may land on an
         // error state.
         expect(
-          find.byType(NavigationBar),
-          findsOneWidget,
+          adaptiveShellIsVisible(),
+          isTrue,
           reason:
               'connecting should replace registration with the app shell. '
               'On screen: ${_visibleText(tester)}',
@@ -172,17 +174,12 @@ void main() {
           await _goBack(tester);
         }
 
-        final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
         final seen = StringBuffer(_visibleText(tester));
-        for (var index = 1; index < bar.destinations.length; index++) {
-          final destination = bar.destinations[index] as NavigationDestination;
-          await _tap(
-            tester,
-            find.byType(NavigationDestination).at(index),
-            seconds: 20,
-          );
-          _expectNoErrorState(tester, destination.label);
-          await _pullToRefresh(tester, destination.label);
+        for (var index = 1; index < adaptiveDestinationCount(tester); index++) {
+          final destinationLabel = adaptiveDestinationLabel(tester, index);
+          await _tap(tester, adaptiveDestinationAt(index), seconds: 20);
+          _expectNoErrorState(tester, destinationLabel);
+          await _pullToRefresh(tester, destinationLabel);
           if (index == 1) {
             final datasetMenu = find.byWidgetPredicate(
               (widget) =>
@@ -327,7 +324,7 @@ Future<void> _connect(WidgetTester tester) async {
 
   final deadline = DateTime.now().add(const Duration(seconds: 90));
   while (DateTime.now().isBefore(deadline)) {
-    if (find.byType(NavigationBar).evaluate().isNotEmpty) {
+    if (adaptiveShellIsVisible()) {
       // Reaching the shell without a trust prompt is correct when the
       // certificate was already pinned by an earlier run on this simulator.
       // Uninstall the app between runs to exercise the first-use path.

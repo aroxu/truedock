@@ -60,8 +60,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get actionConnectServer => '서버 연결';
 
   @override
+  String get actionNext => '다음';
+
+  @override
   String authSucceededSigningIn(String serverName) {
-    return '인증 성공. $serverName에 로그인 중…';
+    return '$serverName에 로그인 중…';
   }
 
   @override
@@ -259,13 +262,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get connectServerNameHint => '홈 NAS';
 
   @override
-  String get connectSecureAddress => '보안 주소';
+  String get connectSecureAddress => 'TrueNAS 서버 주소';
 
   @override
   String get connectSecureAddressHint => 'https://truenas.local';
-
-  @override
-  String get connectSecureAddressHelper => 'TrueDock은 WSS /api/current에 연결합니다.';
 
   @override
   String get connectSignInWith => '로그인 방법';
@@ -6177,7 +6177,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sysNetGlobalTitle => 'DNS 및 게이트웨이';
 
   @override
-  String get sysNetGlobalSubtitle => '호스트 이름, 도메인, 기본 게이트웨이, 네임서버';
+  String get sysNetGlobalSubtitle => '호스트 이름, 도메인, IPv4/IPv6 게이트웨이, 네임서버';
 
   @override
   String get sysNetGlobalEdit => 'DNS 및 게이트웨이 편집';
@@ -6202,6 +6202,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sysNetGateway => 'IPv4 기본 게이트웨이';
+
+  @override
+  String get sysNetIpv6Gateway => 'IPv6 기본 게이트웨이';
 
   @override
   String sysNetNameserver(int index) {
@@ -6252,6 +6255,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sysNetValidationGateway => '올바른 IPv4 주소를 입력하거나 비워서 지우세요.';
+
+  @override
+  String get sysNetValidationIpv6Gateway => '올바른 IPv6 주소를 입력하거나 비워서 지우세요.';
 
   @override
   String get sysNetValidationNameserver => '올바른 IP 주소를 입력하거나 비워서 지우세요.';
@@ -7372,7 +7378,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sysInterfaceUseDhcpTitle => 'IPv4에 DHCP 사용';
 
   @override
-  String get sysInterfaceUseDhcpSubtitle => 'DHCP가 켜져 있는 동안 정적 주소는 무시됩니다.';
+  String get sysInterfaceUseDhcpSubtitle => 'DHCP가 켜져 있는 동안 정적 IPv4 주소는 무시됩니다.';
+
+  @override
+  String get sysInterfaceUseIpv6AutoTitle => 'IPv6 자동 구성';
+
+  @override
+  String get sysInterfaceUseIpv6AutoSubtitle =>
+      '라우터 알림을 받아 IPv6 주소를 자동으로 구성합니다.';
+
+  @override
+  String get sysInterfaceIpv6AutoShort => 'IPv6 자동';
 
   @override
   String sysInterfaceDhcpConflict(String owner) {
@@ -7389,10 +7405,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sysInterfaceAddAddress => '주소 추가';
 
   @override
+  String get sysInterfaceAddIpv4Address => 'IPv4 주소 추가';
+
+  @override
+  String get sysInterfaceAddIpv6Address => 'IPv6 주소 추가';
+
+  @override
   String get sysInterfaceMtuLabel => 'MTU (선택)';
 
   @override
-  String get sysInterfaceMtuHelper => '기본값(1500)을 사용하려면 비워 두세요.';
+  String get sysInterfaceMtuHelper => '변경하지 않으려면 비워 두세요.';
 
   @override
   String get sysInterfaceReviewInterface => '인터페이스';
@@ -7402,6 +7424,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sysInterfaceReviewIpv4 => 'IPv4';
+
+  @override
+  String get sysInterfaceReviewIpv6 => 'IPv6';
+
+  @override
+  String get sysInterfaceReviewAutomatic => '자동';
+
+  @override
+  String get sysInterfaceReviewDisabled => '사용 안 함';
 
   @override
   String get sysInterfaceReviewAddresses => '주소';
@@ -7422,7 +7453,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sysInterfaceReviewNone => '없음';
 
   @override
-  String get sysInterfaceReviewMtuDefault => '기본값 (1500)';
+  String get sysInterfaceReviewMtuDefault => '변경 없음';
 
   @override
   String get sysInterfaceNothingChanged =>
@@ -7431,6 +7462,20 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get sysInterfaceSessionDrop =>
       'TrueDock이 연결된 인터페이스의 주소를 변경하면 커밋할 때 이 세션이 끊깁니다. 체크인이 도착하지 않으면 서버가 변경 사항을 자동으로 롤백합니다.';
+
+  @override
+  String sysInterfaceIpv6AutoEnabledConsequence(String name) {
+    return '$name에서 라우터 알림을 통해 IPv6를 자동으로 구성합니다.';
+  }
+
+  @override
+  String sysInterfaceIpv6AutoDisabledConsequence(String name) {
+    return '$name에서 IPv6 자동 구성을 중지합니다. IPv6 연결이 계속 필요하면 정적 IPv6 주소를 추가하세요.';
+  }
+
+  @override
+  String get sysInterfaceIpv6AutoLosesStatic =>
+      'IPv6 자동 구성을 켜면 이 인터페이스의 정적 IPv6 주소가 제거됩니다.';
 
   @override
   String get sysInterfaceDhcpLosesRoute =>

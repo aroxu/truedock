@@ -465,6 +465,7 @@ class _ServerRegistrationScreenState
   bool _obscureSecret = true;
   bool _keepSignedIn = false;
   bool _enableBiometricUnlock = false;
+  bool _landscapeCredentialStep = false;
 
   @override
   void initState() {
@@ -504,239 +505,368 @@ class _ServerRegistrationScreenState
     final isBusy = connection.stage == ConnectionStage.connecting;
     final biometricSupport = ref.watch(biometricVaultAvailabilityProvider);
     final registeredServer = widget.initialServer;
+    final windowSize = MediaQuery.sizeOf(context);
+    final useLandscapeSteps =
+        registeredServer == null && windowSize.width > windowSize.height;
+    final showLandscapeCredentials =
+        useLandscapeSteps && _landscapeCredentialStep;
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          registeredServer == null
-              ? widget.canClose
-                    ? l10n.connectTitle
-                    : l10n.registrationTitle
-              : l10n.savedServerSignInTitle(registeredServer.profile.name),
+    final identitySection = <Widget>[
+      if (registeredServer == null) ...[
+        const _ConnectionHero(),
+        const SizedBox(height: 28),
+        TextFormField(
+          key: _credentialFormStartKey,
+          enabled: !isBusy,
+          controller: _nameController,
+          textInputAction: TextInputAction.next,
+          decoration: InputDecoration(
+            labelText: l10n.connectServerName,
+            hintText: l10n.connectServerNameHint,
+            prefixIcon: const Icon(Icons.dns_outlined),
+          ),
         ),
-        leading: widget.canClose
-            ? IconButton(
-                onPressed: context.pop,
-                icon: const Icon(Icons.close_rounded),
-                tooltip: l10n.actionClose,
-              )
+        const SizedBox(height: 14),
+        TextFormField(
+          enabled: !isBusy,
+          controller: _addressController,
+          keyboardType: TextInputType.url,
+          textInputAction: TextInputAction.next,
+          autocorrect: false,
+          decoration: InputDecoration(
+            labelText: l10n.connectSecureAddress,
+            hintText: l10n.connectSecureAddressHint,
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+          ),
+          validator: (value) {
+            try {
+              ServerProfile.parse(
+                name: _nameController.text,
+                address: value ?? '',
+              );
+              return null;
+            } on FormatException catch (error) {
+              return error.message;
+            }
+          },
+        ),
+        if (!useLandscapeSteps) const SizedBox(height: 24),
+      ] else ...[
+        Text(
+          l10n.savedServerEnterCredential(registeredServer.profile.name),
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 24),
+      ],
+    ];
+
+    final credentialSection = <Widget>[
+      Text(
+        l10n.connectSignInWith,
+        key: registeredServer == null ? null : _credentialFormStartKey,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      const SizedBox(height: 10),
+      SegmentedButton<AuthMethod>(
+        segments: [
+          ButtonSegment(
+            value: AuthMethod.password,
+            icon: const Icon(Icons.person_outline_rounded),
+            label: Text(l10n.authLogin),
+          ),
+          ButtonSegment(
+            value: AuthMethod.apiKey,
+            icon: const Icon(Icons.key_rounded),
+            label: Text(l10n.authApiKey),
+          ),
+        ],
+        selected: {_method},
+        onSelectionChanged: isBusy
+            ? null
+            : (selection) {
+                setState(() {
+                  _method = selection.first;
+                  _secretController.clear();
+                });
+              },
+      ),
+      const SizedBox(height: 18),
+      TextFormField(
+        enabled: !isBusy,
+        controller: _usernameController,
+        textInputAction: TextInputAction.next,
+        autocorrect: false,
+        decoration: InputDecoration(
+          labelText: l10n.authUsername,
+          prefixIcon: const Icon(Icons.account_circle_outlined),
+        ),
+        validator: (value) => value == null || value.trim().isEmpty
+            ? l10n.authUsernameRequired
             : null,
       ),
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (registeredServer == null) ...[
-                      const _ConnectionHero(),
-                      const SizedBox(height: 28),
-                      TextFormField(
-                        key: _credentialFormStartKey,
-                        enabled: !isBusy,
-                        controller: _nameController,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          labelText: l10n.connectServerName,
-                          hintText: l10n.connectServerNameHint,
-                          prefixIcon: const Icon(Icons.dns_outlined),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        enabled: !isBusy,
-                        controller: _addressController,
-                        keyboardType: TextInputType.url,
-                        textInputAction: TextInputAction.next,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          labelText: l10n.connectSecureAddress,
-                          hintText: l10n.connectSecureAddressHint,
-                          prefixIcon: const Icon(Icons.lock_outline_rounded),
-                          helperText: l10n.connectSecureAddressHelper,
-                        ),
-                        validator: (value) {
-                          try {
-                            ServerProfile.parse(
-                              name: _nameController.text,
-                              address: value ?? '',
-                            );
-                            return null;
-                          } on FormatException catch (error) {
-                            return error.message;
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                    ] else ...[
-                      Text(
-                        l10n.savedServerEnterCredential(
-                          registeredServer.profile.name,
-                        ),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                    Text(
-                      l10n.connectSignInWith,
-                      key: registeredServer == null
-                          ? null
-                          : _credentialFormStartKey,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 10),
-                    SegmentedButton<AuthMethod>(
-                      segments: [
-                        ButtonSegment(
-                          value: AuthMethod.password,
-                          icon: const Icon(Icons.person_outline_rounded),
-                          label: Text(l10n.authLogin),
-                        ),
-                        ButtonSegment(
-                          value: AuthMethod.apiKey,
-                          icon: const Icon(Icons.key_rounded),
-                          label: Text(l10n.authApiKey),
-                        ),
-                      ],
-                      selected: {_method},
-                      onSelectionChanged: isBusy
-                          ? null
-                          : (selection) {
-                              setState(() {
-                                _method = selection.first;
-                                _secretController.clear();
-                              });
-                            },
-                    ),
-                    const SizedBox(height: 18),
-                    TextFormField(
-                      enabled: !isBusy,
-                      controller: _usernameController,
-                      textInputAction: TextInputAction.next,
-                      autocorrect: false,
-                      decoration: InputDecoration(
-                        labelText: l10n.authUsername,
-                        prefixIcon: const Icon(Icons.account_circle_outlined),
-                      ),
-                      validator: (value) =>
-                          value == null || value.trim().isEmpty
-                          ? l10n.authUsernameRequired
-                          : null,
-                    ),
-                    const SizedBox(height: 14),
-                    TextFormField(
-                      enabled: !isBusy,
-                      controller: _secretController,
-                      obscureText: _obscureSecret,
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      onFieldSubmitted: isBusy ? null : (_) => _connect(),
-                      decoration: InputDecoration(
-                        labelText: _method == AuthMethod.apiKey
-                            ? l10n.authApiKey
-                            : l10n.authPassword,
-                        prefixIcon: Icon(
-                          _method == AuthMethod.apiKey
-                              ? Icons.vpn_key_outlined
-                              : Icons.password_rounded,
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: isBusy
-                              ? null
-                              : () => setState(
-                                  () => _obscureSecret = !_obscureSecret,
-                                ),
-                          icon: Icon(
-                            _obscureSecret
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          tooltip: _obscureSecret
-                              ? l10n.authShowCredential
-                              : l10n.authHideCredential,
-                        ),
-                      ),
-                      validator: (value) => value == null || value.isEmpty
-                          ? l10n.authCredentialRequired
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: _keepSignedIn,
-                      onChanged: !isBusy
-                          ? (value) => setState(() {
-                              _keepSignedIn = value;
-                              if (!_keepSignedIn) {
-                                _enableBiometricUnlock = false;
-                              }
-                            })
-                          : null,
-                      title: Text(l10n.authKeepSignedIn),
-                      subtitle: Text(l10n.authProtectWithAppPassword),
-                    ),
-                    biometricSupport.when(
-                      data: (support) => support.canSave
-                          ? SwitchListTile(
-                              contentPadding: EdgeInsets.zero,
-                              value: _keepSignedIn && _enableBiometricUnlock,
-                              onChanged: _keepSignedIn && !isBusy
-                                  ? (value) => setState(
-                                      () => _enableBiometricUnlock = value,
-                                    )
-                                  : null,
-                              secondary: const Icon(Icons.fingerprint_rounded),
-                              title: Text(l10n.authBiometricUnlock),
-                              subtitle: Text(
-                                l10n.authBiometricUnlockDescription,
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, _) => const SizedBox.shrink(),
-                    ),
-                    if (connection.error case final error?) ...[
-                      const SizedBox(height: 16),
-                      _InlineError(message: l10n.connectionMessage(error)),
-                    ],
-                    const SizedBox(height: 24),
-                    FilledButton.icon(
-                      onPressed: isBusy ? null : _connect,
-                      icon: isBusy
-                          ? const SizedBox.square(
-                              dimension: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.link_rounded),
-                      label: Text(
-                        isBusy
-                            ? l10n.authConnectingSecurely
-                            : l10n.actionConnectServer,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.authTransportNotice,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+      const SizedBox(height: 14),
+      TextFormField(
+        enabled: !isBusy,
+        controller: _secretController,
+        obscureText: _obscureSecret,
+        autocorrect: false,
+        enableSuggestions: false,
+        onFieldSubmitted: isBusy ? null : (_) => _connect(),
+        decoration: InputDecoration(
+          labelText: _method == AuthMethod.apiKey
+              ? l10n.authApiKey
+              : l10n.authPassword,
+          prefixIcon: Icon(
+            _method == AuthMethod.apiKey
+                ? Icons.vpn_key_outlined
+                : Icons.password_rounded,
+          ),
+          suffixIcon: IconButton(
+            onPressed: isBusy
+                ? null
+                : () => setState(() => _obscureSecret = !_obscureSecret),
+            icon: Icon(
+              _obscureSecret
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+            ),
+            tooltip: _obscureSecret
+                ? l10n.authShowCredential
+                : l10n.authHideCredential,
+          ),
+        ),
+        validator: (value) =>
+            value == null || value.isEmpty ? l10n.authCredentialRequired : null,
+      ),
+      const SizedBox(height: 12),
+      SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        value: _keepSignedIn,
+        onChanged: !isBusy
+            ? (value) => setState(() {
+                _keepSignedIn = value;
+                if (!_keepSignedIn) {
+                  _enableBiometricUnlock = false;
+                }
+              })
+            : null,
+        title: Text(l10n.authKeepSignedIn),
+        subtitle: Text(l10n.authProtectWithAppPassword),
+      ),
+      biometricSupport.when(
+        data: (support) => support.canSave
+            ? SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _keepSignedIn && _enableBiometricUnlock,
+                onChanged: _keepSignedIn && !isBusy
+                    ? (value) => setState(() => _enableBiometricUnlock = value)
+                    : null,
+                secondary: const Icon(Icons.fingerprint_rounded),
+                title: Text(l10n.authBiometricUnlock),
+                subtitle: Text(l10n.authBiometricUnlockDescription),
+              )
+            : const SizedBox.shrink(),
+        loading: () => const SizedBox.shrink(),
+        error: (_, _) => const SizedBox.shrink(),
+      ),
+    ];
+
+    final submissionSection = <Widget>[
+      if (connection.error case final error?) ...[
+        const SizedBox(height: 16),
+        _InlineError(message: l10n.connectionMessage(error)),
+      ],
+      const SizedBox(height: 24),
+      FilledButton.icon(
+        onPressed: isBusy
+            ? null
+            : useLandscapeSteps && !showLandscapeCredentials
+            ? _continueToCredentials
+            : _connect,
+        icon: AnimatedSwitcher(
+          duration: context.motionDuration(AppMotion.quick),
+          child: isBusy
+              ? const SizedBox.square(
+                  key: ValueKey('registration-action-busy'),
+                  dimension: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(
+                  key: ValueKey(
+                    useLandscapeSteps && !showLandscapeCredentials
+                        ? 'registration-action-next-icon'
+                        : 'registration-action-connect-icon',
+                  ),
+                  useLandscapeSteps && !showLandscapeCredentials
+                      ? Icons.arrow_forward_rounded
+                      : Icons.link_rounded,
                 ),
-              ),
+        ),
+        label: AnimatedSwitcher(
+          duration: context.motionDuration(AppMotion.quick),
+          child: Text(
+            isBusy
+                ? l10n.authConnectingSecurely
+                : useLandscapeSteps && !showLandscapeCredentials
+                ? l10n.actionNext
+                : l10n.actionConnectServer,
+            key: ValueKey(
+              isBusy
+                  ? 'registration-action-busy-label'
+                  : useLandscapeSteps && !showLandscapeCredentials
+                  ? 'registration-action-next-label'
+                  : 'registration-action-connect-label',
             ),
           ),
         ),
       ),
+      const SizedBox(height: 12),
+      Text(
+        l10n.authTransportNotice,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    ];
+
+    return PopScope<Object?>(
+      canPop: !showLandscapeCredentials,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && showLandscapeCredentials) {
+          _returnToServerStep();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(
+            registeredServer == null
+                ? widget.canClose
+                      ? l10n.connectTitle
+                      : l10n.registrationTitle
+                : l10n.savedServerSignInTitle(registeredServer.profile.name),
+          ),
+          leading: showLandscapeCredentials
+              ? IconButton(
+                  onPressed: _returnToServerStep,
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  tooltip: l10n.actionBack,
+                )
+              : widget.canClose
+              ? IconButton(
+                  onPressed: context.pop,
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: l10n.actionClose,
+                )
+              : null,
+        ),
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, viewport) {
+              const verticalPadding = 40.0;
+              final centredHeight = viewport.maxHeight > verticalPadding
+                  ? viewport.maxHeight - verticalPadding
+                  : 0.0;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: useLandscapeSteps ? centredHeight : 0,
+                      maxWidth: useLandscapeSteps ? 900 : 600,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: useLandscapeSteps
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (useLandscapeSteps) ...[
+                            AnimatedSize(
+                              duration: context.motionDuration(
+                                AppMotion.emphasized,
+                              ),
+                              curve: AppMotion.standardCurve,
+                              alignment: Alignment.center,
+                              child: AnimatedSwitcher(
+                                duration: context.motionDuration(
+                                  AppMotion.emphasized,
+                                ),
+                                switchInCurve: AppMotion.standardCurve,
+                                switchOutCurve: AppMotion.exitCurve,
+                                transitionBuilder: (child, animation) {
+                                  final enteringCredentials =
+                                      child.key ==
+                                      const ValueKey(
+                                        'registration-credentials',
+                                      );
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: SlideTransition(
+                                      position:
+                                          Tween<Offset>(
+                                            begin: Offset(
+                                              enteringCredentials
+                                                  ? 0.14
+                                                  : -0.14,
+                                              0,
+                                            ),
+                                            end: Offset.zero,
+                                          ).animate(
+                                            CurvedAnimation(
+                                              parent: animation,
+                                              curve: AppMotion.standardCurve,
+                                            ),
+                                          ),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  key: ValueKey(
+                                    showLandscapeCredentials
+                                        ? 'registration-credentials'
+                                        : 'registration-server',
+                                  ),
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: showLandscapeCredentials
+                                      ? credentialSection
+                                      : identitySection,
+                                ),
+                              ),
+                            ),
+                            ...submissionSection,
+                          ] else ...[
+                            ...identitySection,
+                            ...credentialSection,
+                            ...submissionSection,
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
+  }
+
+  void _continueToCredentials() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
+    setState(() => _landscapeCredentialStep = true);
+  }
+
+  void _returnToServerStep() {
+    FocusScope.of(context).unfocus();
+    setState(() => _landscapeCredentialStep = false);
   }
 
   Future<void> _connect() async {

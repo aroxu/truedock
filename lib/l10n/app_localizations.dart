@@ -200,10 +200,16 @@ abstract class AppLocalizations {
   /// **'Connect server'**
   String get actionConnectServer;
 
+  /// No description provided for @actionNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get actionNext;
+
   /// No description provided for @authSucceededSigningIn.
   ///
   /// In en, this message translates to:
-  /// **'Authentication successful. Signing in to {serverName}…'**
+  /// **'Signing in to {serverName}…'**
   String authSucceededSigningIn(String serverName);
 
   /// No description provided for @actionContinue.
@@ -550,7 +556,7 @@ abstract class AppLocalizations {
   /// No description provided for @connectSecureAddress.
   ///
   /// In en, this message translates to:
-  /// **'Secure address'**
+  /// **'TrueNAS Server Address'**
   String get connectSecureAddress;
 
   /// No description provided for @connectSecureAddressHint.
@@ -558,12 +564,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'https://truenas.local'**
   String get connectSecureAddressHint;
-
-  /// No description provided for @connectSecureAddressHelper.
-  ///
-  /// In en, this message translates to:
-  /// **'TrueDock connects to WSS /api/current.'**
-  String get connectSecureAddressHelper;
 
   /// No description provided for @connectSignInWith.
   ///
@@ -10781,7 +10781,7 @@ abstract class AppLocalizations {
   /// No description provided for @sysNetGlobalSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Hostname, domain, default gateway, nameservers'**
+  /// **'Hostname, domain, IPv4/IPv6 gateways, nameservers'**
   String get sysNetGlobalSubtitle;
 
   /// No description provided for @sysNetGlobalEdit.
@@ -10831,6 +10831,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'IPv4 default gateway'**
   String get sysNetGateway;
+
+  /// No description provided for @sysNetIpv6Gateway.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6 default gateway'**
+  String get sysNetIpv6Gateway;
 
   /// No description provided for @sysNetNameserver.
   ///
@@ -10921,6 +10927,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a valid IPv4 address, or leave empty to clear it.'**
   String get sysNetValidationGateway;
+
+  /// No description provided for @sysNetValidationIpv6Gateway.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid IPv6 address, or leave empty to clear it.'**
+  String get sysNetValidationIpv6Gateway;
 
   /// No description provided for @sysNetValidationNameserver.
   ///
@@ -12831,8 +12843,26 @@ abstract class AppLocalizations {
   /// No description provided for @sysInterfaceUseDhcpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Static addresses are ignored while DHCP is on.'**
+  /// **'Static IPv4 addresses are ignored while DHCP is on.'**
   String get sysInterfaceUseDhcpSubtitle;
+
+  /// No description provided for @sysInterfaceUseIpv6AutoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure IPv6 automatically'**
+  String get sysInterfaceUseIpv6AutoTitle;
+
+  /// No description provided for @sysInterfaceUseIpv6AutoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept IPv6 router advertisements for automatic addressing.'**
+  String get sysInterfaceUseIpv6AutoSubtitle;
+
+  /// No description provided for @sysInterfaceIpv6AutoShort.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6 automatic'**
+  String get sysInterfaceIpv6AutoShort;
 
   /// No description provided for @sysInterfaceDhcpConflict.
   ///
@@ -12858,6 +12888,18 @@ abstract class AppLocalizations {
   /// **'Add address'**
   String get sysInterfaceAddAddress;
 
+  /// No description provided for @sysInterfaceAddIpv4Address.
+  ///
+  /// In en, this message translates to:
+  /// **'Add IPv4 address'**
+  String get sysInterfaceAddIpv4Address;
+
+  /// No description provided for @sysInterfaceAddIpv6Address.
+  ///
+  /// In en, this message translates to:
+  /// **'Add IPv6 address'**
+  String get sysInterfaceAddIpv6Address;
+
   /// No description provided for @sysInterfaceMtuLabel.
   ///
   /// In en, this message translates to:
@@ -12867,7 +12909,7 @@ abstract class AppLocalizations {
   /// No description provided for @sysInterfaceMtuHelper.
   ///
   /// In en, this message translates to:
-  /// **'Leave blank for the default (1500).'**
+  /// **'Leave blank to keep the current value.'**
   String get sysInterfaceMtuHelper;
 
   /// No description provided for @sysInterfaceReviewInterface.
@@ -12887,6 +12929,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'IPv4'**
   String get sysInterfaceReviewIpv4;
+
+  /// No description provided for @sysInterfaceReviewIpv6.
+  ///
+  /// In en, this message translates to:
+  /// **'IPv6'**
+  String get sysInterfaceReviewIpv6;
+
+  /// No description provided for @sysInterfaceReviewAutomatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic'**
+  String get sysInterfaceReviewAutomatic;
+
+  /// No description provided for @sysInterfaceReviewDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get sysInterfaceReviewDisabled;
 
   /// No description provided for @sysInterfaceReviewAddresses.
   ///
@@ -12927,7 +12987,7 @@ abstract class AppLocalizations {
   /// No description provided for @sysInterfaceReviewMtuDefault.
   ///
   /// In en, this message translates to:
-  /// **'Default (1500)'**
+  /// **'Unchanged'**
   String get sysInterfaceReviewMtuDefault;
 
   /// No description provided for @sysInterfaceNothingChanged.
@@ -12941,6 +13001,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Changing the address of the interface TrueDock is connected through will drop this session when you commit. The server rolls the change back automatically if the check-in does not arrive.'**
   String get sysInterfaceSessionDrop;
+
+  /// No description provided for @sysInterfaceIpv6AutoEnabledConsequence.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will configure IPv6 automatically from router advertisements.'**
+  String sysInterfaceIpv6AutoEnabledConsequence(String name);
+
+  /// No description provided for @sysInterfaceIpv6AutoDisabledConsequence.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will stop automatic IPv6 configuration. Add a static IPv6 address if this interface still needs IPv6 connectivity.'**
+  String sysInterfaceIpv6AutoDisabledConsequence(String name);
+
+  /// No description provided for @sysInterfaceIpv6AutoLosesStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Turning on automatic IPv6 removes the static IPv6 addresses on this interface.'**
+  String get sysInterfaceIpv6AutoLosesStatic;
 
   /// No description provided for @sysInterfaceDhcpLosesRoute.
   ///

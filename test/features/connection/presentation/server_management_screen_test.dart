@@ -210,7 +210,7 @@ void main() {
     expect(controller.switched, [_other.id]);
     expect(find.text('Add TrueNAS server'), findsNothing);
     expect(find.text('Server name'), findsNothing);
-    expect(find.text('Secure address'), findsNothing);
+    expect(find.text('TrueNAS Server Address'), findsNothing);
     expect(find.byType(TextFormField), findsNothing);
   });
 

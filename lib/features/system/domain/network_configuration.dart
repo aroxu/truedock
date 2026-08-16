@@ -7,6 +7,7 @@ enum NetworkValidationCode {
   hostnameInvalid,
   domainInvalid,
   gatewayInvalid,
+  ipv6GatewayInvalid,
   nameserverInvalid,
   proxyInvalid,
 }
@@ -89,8 +90,11 @@ class NetworkConfiguration {
   /// from DHCP and editing a field here overrides the lease.
   bool get isDhcpDerived =>
       ipv4Gateway.isEmpty &&
+      ipv6Gateway.isEmpty &&
       nameservers.isEmpty &&
-      (effective.ipv4Gateway.isNotEmpty || effective.nameservers.isNotEmpty);
+      (effective.ipv4Gateway.isNotEmpty ||
+          effective.ipv6Gateway.isNotEmpty ||
+          effective.nameservers.isNotEmpty);
 }
 
 /// The nested `state` object: values currently applied to the system.
@@ -130,6 +134,7 @@ class NetworkConfigurationEdit {
     this.hostname,
     this.domain,
     this.ipv4Gateway,
+    this.ipv6Gateway,
     this.nameserver1,
     this.nameserver2,
     this.nameserver3,
@@ -142,6 +147,7 @@ class NetworkConfigurationEdit {
     required String hostname,
     required String domain,
     required String ipv4Gateway,
+    String? ipv6Gateway,
     required String nameserver1,
     required String nameserver2,
     required String nameserver3,
@@ -150,6 +156,9 @@ class NetworkConfigurationEdit {
     hostname: hostname == baseline.hostname ? null : hostname,
     domain: domain == baseline.domain ? null : domain,
     ipv4Gateway: ipv4Gateway == baseline.ipv4Gateway ? null : ipv4Gateway,
+    ipv6Gateway: ipv6Gateway == null || ipv6Gateway == baseline.ipv6Gateway
+        ? null
+        : ipv6Gateway,
     nameserver1: nameserver1 == baseline.nameserver1 ? null : nameserver1,
     nameserver2: nameserver2 == baseline.nameserver2 ? null : nameserver2,
     nameserver3: nameserver3 == baseline.nameserver3 ? null : nameserver3,
@@ -159,6 +168,7 @@ class NetworkConfigurationEdit {
   final String? hostname;
   final String? domain;
   final String? ipv4Gateway;
+  final String? ipv6Gateway;
   final String? nameserver1;
   final String? nameserver2;
   final String? nameserver3;
@@ -194,6 +204,12 @@ class NetworkConfigurationEdit {
         const NetworkValidationIssue(NetworkValidationCode.gatewayInvalid),
       );
     }
+    final gateway6 = ipv6Gateway;
+    if (gateway6 != null && gateway6.isNotEmpty && !_isIpv6(gateway6)) {
+      issues.add(
+        const NetworkValidationIssue(NetworkValidationCode.ipv6GatewayInvalid),
+      );
+    }
     for (final nameserver in [nameserver1, nameserver2, nameserver3]) {
       if (nameserver != null &&
           nameserver.isNotEmpty &&
@@ -218,6 +234,7 @@ class NetworkConfigurationEdit {
     if (hostname != null) 'hostname': hostname!.trim(),
     if (domain != null) 'domain': domain!.trim(),
     if (ipv4Gateway != null) 'ipv4gateway': ipv4Gateway,
+    if (ipv6Gateway != null) 'ipv6gateway': ipv6Gateway,
     if (nameserver1 != null) 'nameserver1': nameserver1,
     if (nameserver2 != null) 'nameserver2': nameserver2,
     if (nameserver3 != null) 'nameserver3': nameserver3,
@@ -233,6 +250,10 @@ class NetworkConfigurationEdit {
         ipv4Gateway != null &&
         ipv4Gateway!.isEmpty &&
         baseline.effective.ipv4Gateway.isNotEmpty;
+    final clearsIpv6Gateway =
+        ipv6Gateway != null &&
+        ipv6Gateway!.isEmpty &&
+        baseline.effective.ipv6Gateway.isNotEmpty;
     final clearsDns =
         [
           nameserver1,
@@ -240,7 +261,7 @@ class NetworkConfigurationEdit {
           nameserver3,
         ].any((value) => value != null && value.isEmpty) &&
         baseline.effective.nameservers.isNotEmpty;
-    return clearsGateway || clearsDns;
+    return clearsGateway || clearsIpv6Gateway || clearsDns;
   }
 }
 

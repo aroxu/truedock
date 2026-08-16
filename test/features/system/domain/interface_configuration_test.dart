@@ -48,6 +48,7 @@ void main() {
         'name': 'eno1',
         'description': 'LAN',
         'ipv4_dhcp': false,
+        'ipv6_auto': true,
         'mtu': 9000,
         'aliases': [
           {'address': '192.168.1.10', 'netmask': 24, 'type': 'INET'},
@@ -56,6 +57,7 @@ void main() {
       });
       expect(config.id, 'eno1');
       expect(config.ipv4Dhcp, isFalse);
+      expect(config.ipv6Auto, isTrue);
       expect(config.mtu, 9000);
       expect(config.aliases.length, 2);
       expect(config.aliases.last.isIpv6, isTrue);
@@ -79,6 +81,7 @@ void main() {
     test('sends aliases and mtu for a static interface', () {
       final json = _static.toApiJson();
       expect(json['ipv4_dhcp'], false);
+      expect(json['ipv6_auto'], false);
       expect(json['mtu'], 1500);
       expect(json['aliases'], [
         {'address': '192.168.1.10', 'netmask': 24, 'type': 'INET'},
@@ -91,7 +94,38 @@ void main() {
       expect(json['aliases'], isEmpty);
     });
 
-    test('omits mtu when unset so the server keeps its default', () {
+    test('keeps IPv6 aliases while IPv4 DHCP is on', () {
+      final json = _static
+          .copyWith(
+            ipv4Dhcp: true,
+            aliases: const [
+              InterfaceAlias(address: '192.168.1.10', netmask: 24),
+              InterfaceAlias(address: 'fd00::10', netmask: 64, type: 'INET6'),
+            ],
+          )
+          .toApiJson();
+      expect(json['aliases'], [
+        {'address': 'fd00::10', 'netmask': 64, 'type': 'INET6'},
+      ]);
+    });
+
+    test('omits only IPv6 aliases while automatic IPv6 is on', () {
+      final json = _static
+          .copyWith(
+            ipv6Auto: true,
+            aliases: const [
+              InterfaceAlias(address: '192.168.1.10', netmask: 24),
+              InterfaceAlias(address: 'fd00::10', netmask: 64, type: 'INET6'),
+            ],
+          )
+          .toApiJson();
+      expect(json['ipv6_auto'], true);
+      expect(json['aliases'], [
+        {'address': '192.168.1.10', 'netmask': 24, 'type': 'INET'},
+      ]);
+    });
+
+    test('omits mtu when unset so the server keeps its current value', () {
       final json = _static.copyWith(clearMtu: true).toApiJson();
       expect(json.containsKey('mtu'), isFalse);
     });
@@ -104,6 +138,7 @@ void main() {
 
     test('detects a DHCP toggle, mtu change, and alias edits', () {
       expect(_static.copyWith(ipv4Dhcp: true).differsFrom(_static), isTrue);
+      expect(_static.copyWith(ipv6Auto: true).differsFrom(_static), isTrue);
       expect(_static.copyWith(mtu: 9000).differsFrom(_static), isTrue);
       expect(_static.copyWith(aliases: const []).differsFrom(_static), isTrue);
       expect(
@@ -185,12 +220,14 @@ void main() {
       );
     });
 
-    test('skips alias validation entirely while DHCP is on', () {
+    test('still validates IPv6 aliases while IPv4 DHCP is on', () {
       final config = _static.copyWith(
         ipv4Dhcp: true,
-        aliases: const [InterfaceAlias(address: 'bogus', netmask: 99)],
+        aliases: const [
+          InterfaceAlias(address: 'bogus', netmask: 99, type: 'INET6'),
+        ],
       );
-      expect(validateInterfaceConfiguration(config), isEmpty);
+      expect(validateInterfaceConfiguration(config)['aliases'], isNotNull);
     });
   });
 

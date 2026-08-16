@@ -59,11 +59,15 @@ void main() {
   });
 
   testWidgets('opens registration instead of an empty shell', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(_testApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Register TrueNAS server'), findsOneWidget);
-    expect(find.text('Secure address'), findsOneWidget);
+    expect(find.text('TrueNAS Server Address'), findsOneWidget);
+    expect(find.textContaining('WSS /api/current'), findsNothing);
     expect(find.text('Connect server'), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.byIcon(Icons.close_rounded), findsNothing);
@@ -165,7 +169,7 @@ void main() {
     expect(find.text('Sign in to Home NAS'), findsOneWidget);
     expect(find.text('Add TrueNAS server'), findsNothing);
     expect(find.text('Server name'), findsNothing);
-    expect(find.text('Secure address'), findsNothing);
+    expect(find.text('TrueNAS Server Address'), findsNothing);
     expect(find.text('Password'), findsOneWidget);
   });
 
@@ -203,7 +207,7 @@ void main() {
     expect(find.text('Sign in to Home NAS'), findsOneWidget);
     expect(find.byType(TextFormField), findsOneWidget);
     expect(find.text('Server name'), findsNothing);
-    expect(find.text('Secure address'), findsNothing);
+    expect(find.text('TrueNAS Server Address'), findsNothing);
     expect(find.text('Add TrueNAS server'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -236,7 +240,7 @@ void main() {
       expect(find.text('Erase all TrueDock data'), findsOneWidget);
       expect(find.text('Erase all data from this device?'), findsOneWidget);
       expect(find.text('Server name'), findsNothing);
-      expect(find.text('Secure address'), findsNothing);
+      expect(find.text('TrueNAS Server Address'), findsNothing);
     },
   );
 

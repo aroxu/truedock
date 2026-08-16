@@ -92,6 +92,7 @@ class InterfaceConfiguration {
     required this.name,
     this.description = '',
     required this.ipv4Dhcp,
+    this.ipv6Auto = false,
     this.aliases = const [],
     this.mtu,
   });
@@ -108,6 +109,7 @@ class InterfaceConfiguration {
           ? json['description'] as String
           : '',
       ipv4Dhcp: json['ipv4_dhcp'] == true,
+      ipv6Auto: json['ipv6_auto'] == true,
       aliases: rawAliases is List
           ? rawAliases
                 .whereType<Map<String, dynamic>>()
@@ -126,23 +128,31 @@ class InterfaceConfiguration {
   /// Only one interface on the system may use DHCP.
   final bool ipv4Dhcp;
 
-  /// Static addresses. Ignored by the server while DHCP is on.
+  /// Whether the interface accepts IPv6 router advertisements and configures
+  /// its IPv6 address automatically.
+  final bool ipv6Auto;
+
+  /// Static IPv4 and IPv6 addresses. Entries are omitted for an address family
+  /// while that family's automatic configuration is enabled.
   final List<InterfaceAlias> aliases;
 
-  /// Null leaves the MTU unset so the interface keeps the default (1500).
+  /// Addresses active under the current automatic-addressing choices.
+  Iterable<InterfaceAlias> get activeAliases =>
+      aliases.where((alias) => alias.isIpv6 ? !ipv6Auto : !ipv4Dhcp);
+
+  /// Null leaves the MTU unchanged.
   final int? mtu;
 
   /// Payload for `interface.update`.
   ///
-  /// Aliases are sent as an empty list while DHCP is on, because a static
-  /// address and DHCP on the same interface is contradictory. `mtu` is only
-  /// included when set so the server keeps its default otherwise.
+  /// Static aliases are omitted while automatic configuration is on for their
+  /// address family. `mtu` is only included when set so a blank editor field
+  /// leaves the current server value unchanged.
   Map<String, Object?> toApiJson() => {
     'description': description,
     'ipv4_dhcp': ipv4Dhcp,
-    'aliases': ipv4Dhcp
-        ? const <Map<String, Object?>>[]
-        : aliases.map((alias) => alias.toApiJson()).toList(),
+    'ipv6_auto': ipv6Auto,
+    'aliases': activeAliases.map((alias) => alias.toApiJson()).toList(),
     if (mtu != null) 'mtu': mtu,
   };
 
@@ -151,6 +161,7 @@ class InterfaceConfiguration {
     String? name,
     String? description,
     bool? ipv4Dhcp,
+    bool? ipv6Auto,
     List<InterfaceAlias>? aliases,
     int? mtu,
     bool clearMtu = false,
@@ -159,6 +170,7 @@ class InterfaceConfiguration {
     name: name ?? this.name,
     description: description ?? this.description,
     ipv4Dhcp: ipv4Dhcp ?? this.ipv4Dhcp,
+    ipv6Auto: ipv6Auto ?? this.ipv6Auto,
     aliases: aliases ?? this.aliases,
     mtu: clearMtu ? null : (mtu ?? this.mtu),
   );
@@ -167,6 +179,7 @@ class InterfaceConfiguration {
   bool differsFrom(InterfaceConfiguration baseline) {
     if (description != baseline.description) return true;
     if (ipv4Dhcp != baseline.ipv4Dhcp) return true;
+    if (ipv6Auto != baseline.ipv6Auto) return true;
     if (mtu != baseline.mtu) return true;
     if (aliases.length != baseline.aliases.length) return true;
     for (var i = 0; i < aliases.length; i++) {
@@ -194,40 +207,39 @@ Map<String, InterfaceValidationIssue> validateInterfaceConfiguration(
       InterfaceValidationContext(),
     );
   }
-  if (!config.ipv4Dhcp) {
-    if (config.aliases.isEmpty) {
-      errors['aliases'] = const InterfaceValidationIssue(
-        InterfaceValidationCode.aliasesRequired,
-        InterfaceValidationContext(),
+  final activeAliases = config.activeAliases.toList(growable: false);
+  if (!config.ipv4Dhcp && !config.ipv6Auto && activeAliases.isEmpty) {
+    errors['aliases'] = const InterfaceValidationIssue(
+      InterfaceValidationCode.aliasesRequired,
+      InterfaceValidationContext(),
+    );
+  }
+  final seen = <String>{};
+  for (final alias in activeAliases) {
+    if (!isValidIpAddress(alias.address, ipv6: alias.isIpv6)) {
+      errors['aliases'] = InterfaceValidationIssue(
+        InterfaceValidationCode.aliasAddressInvalid,
+        InterfaceValidationContext(ipv6: alias.isIpv6),
       );
+      break;
     }
-    final seen = <String>{};
-    for (final alias in config.aliases) {
-      if (!isValidIpAddress(alias.address, ipv6: alias.isIpv6)) {
-        errors['aliases'] = InterfaceValidationIssue(
-          InterfaceValidationCode.aliasAddressInvalid,
-          InterfaceValidationContext(ipv6: alias.isIpv6),
-        );
-        break;
-      }
-      final maxPrefix = alias.isIpv6 ? 128 : 32;
-      if (alias.netmask < 1 || alias.netmask > maxPrefix) {
-        errors['aliases'] = InterfaceValidationIssue(
-          InterfaceValidationCode.aliasPrefixRange,
-          InterfaceValidationContext(
-            address: alias.address,
-            maxPrefix: maxPrefix,
-          ),
-        );
-        break;
-      }
-      if (!seen.add(alias.address)) {
-        errors['aliases'] = InterfaceValidationIssue(
-          InterfaceValidationCode.aliasDuplicate,
-          InterfaceValidationContext(address: alias.address),
-        );
-        break;
-      }
+    final maxPrefix = alias.isIpv6 ? 128 : 32;
+    if (alias.netmask < 1 || alias.netmask > maxPrefix) {
+      errors['aliases'] = InterfaceValidationIssue(
+        InterfaceValidationCode.aliasPrefixRange,
+        InterfaceValidationContext(
+          address: alias.address,
+          maxPrefix: maxPrefix,
+        ),
+      );
+      break;
+    }
+    if (!seen.add('${alias.type}:${alias.address}')) {
+      errors['aliases'] = InterfaceValidationIssue(
+        InterfaceValidationCode.aliasDuplicate,
+        InterfaceValidationContext(address: alias.address),
+      );
+      break;
     }
   }
   return errors;

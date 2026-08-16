@@ -28,6 +28,8 @@ import 'package:true_dock/features/actions/data/server_actions_repository.dart';
 import 'package:true_dock/core/api/truenas_client_provider.dart';
 import 'package:true_dock/features/resources/presentation/server_resources_provider.dart';
 
+import 'adaptive_shell_test_helpers.dart';
+
 const _live = String.fromEnvironment('TRUEDOCK_LIVE');
 const _host = String.fromEnvironment('TRUEDOCK_HOST');
 const _user = String.fromEnvironment('TRUEDOCK_USER');
@@ -64,13 +66,13 @@ void main() {
           await _register(tester);
 
           expect(
-            find.byType(NavigationBar),
-            findsOneWidget,
+            adaptiveShellIsVisible(),
+            isTrue,
             reason: 'expected the app shell. On screen: ${_text(tester)}',
           );
 
           // Storage is the second destination.
-          await _tap(tester, find.byType(NavigationDestination).at(1));
+          await _tap(tester, adaptiveDestinationAt(1));
 
           // ---- create the dataset ----------------------------------------
 
@@ -170,7 +172,7 @@ Future<void> _register(WidgetTester tester) async {
 
   final deadline = DateTime.now().add(const Duration(seconds: 90));
   while (DateTime.now().isBefore(deadline)) {
-    if (find.byType(NavigationBar).evaluate().isNotEmpty) return;
+    if (adaptiveShellIsVisible()) return;
     final trust = find.byIcon(Icons.shield_outlined);
     if (trust.evaluate().isNotEmpty) {
       await tester.tap(trust, warnIfMissed: false);
