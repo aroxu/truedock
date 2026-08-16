@@ -1,0 +1,58 @@
+name: "기능 추가 제안 (한국어)"
+description: "새 기능이나 기존 기능의 개선을 제안해 주세요."
+title: "[기능 제안] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        제안해 주셔서 감사합니다. TrueDock은 TrueNAS SCALE Community Edition 25.10 이상을 대상으로 합니다.
+
+        민감정보가 포함된 Issue 또는 첨부 자료는 별도 고지 없이 삭제될 수 있습니다.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "해결하려는 문제"
+      description: "어떤 불편이나 관리 문제를 해결하고 싶은지 설명해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "제안하는 기능"
+      description: "원하는 동작과 사용 흐름을 구체적으로 작성해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "고려한 대안"
+      description: "현재 사용 중인 우회 방법이나 다른 해결책이 있다면 작성해 주세요."
+  - type: dropdown
+    id: area
+    attributes:
+      label: "관련 영역"
+      options:
+        - "개요"
+        - "스토리지"
+        - "데이터 보호"
+        - "앱"
+        - "시스템"
+        - "앱 설정"
+        - "연결 및 인증"
+        - "기타"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "추가 정보"
+      description: "참고할 화면, TrueNAS API 문서 또는 예시가 있다면 첨부해 주세요. 민감정보는 제거해 주세요."
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "확인 사항"
+      options:
+        - label: "기존 Issue에서 비슷한 제안을 검색했습니다."
+          required: true
+        - label: "TrueNAS SCALE Community Edition 25.10 이상과 관련된 제안입니다."
+          required: true

@@ -1,0 +1,74 @@
+name: "Bug report (English)"
+description: "Report a reproducible error or unexpected behavior."
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve TrueDock.
+
+        Remove all sensitive data, including server addresses, usernames, passwords, API keys, OTPs, and certificate contents.
+        Issues or attachments containing sensitive data may be deleted without notice.
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Problem description"
+      description: "Clearly describe what went wrong."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to reproduce"
+      description: "List the actions that consistently reproduce the problem."
+      placeholder: |
+        1. Open …
+        2. Tap …
+        3. Observe …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected behavior"
+      description: "Describe what should have happened instead."
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Environment"
+      description: "Provide the TrueDock, operating system, and TrueNAS versions."
+      placeholder: |
+        - TrueDock: 1.0.2+5
+        - Device/OS: iPhone / iOS 26 or Android device / Android version
+        - TrueNAS SCALE: 25.10.x
+    validations:
+      required: true
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: "Frequency"
+      options:
+        - "Always"
+        - "Often"
+        - "Sometimes"
+        - "Occurred once"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Logs and screenshots"
+      description: "Attach redacted logs, screenshots, or a screen recording if available."
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checklist"
+      options:
+        - label: "I reproduced this on the latest release."
+          required: true
+        - label: "I searched existing issues for the same problem."
+          required: true
+        - label: "I removed sensitive data from all attachments."
+          required: true

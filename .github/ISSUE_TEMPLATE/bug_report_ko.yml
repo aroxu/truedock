@@ -1,0 +1,74 @@
+name: "버그 제보 (한국어)"
+description: "재현 가능한 오류나 예상과 다른 동작을 알려주세요."
+title: "[버그] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        제보해 주셔서 감사합니다.
+
+        서버 주소, 사용자 이름, 비밀번호, API 키, OTP, 인증서 원문 등 민감정보는 반드시 제거해 주세요.
+        민감정보가 포함된 Issue 또는 첨부 자료는 별도 고지 없이 삭제될 수 있습니다.
+  - type: textarea
+    id: summary
+    attributes:
+      label: "문제 설명"
+      description: "무엇이 잘못 동작했는지 간단명료하게 설명해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "재현 방법"
+      description: "문제가 발생할 때까지의 동작을 순서대로 작성해 주세요."
+      placeholder: |
+        1. … 화면으로 이동
+        2. … 버튼을 누름
+        3. … 오류가 발생함
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "예상한 동작"
+      description: "정상이라면 어떻게 동작해야 하는지 작성해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: "환경"
+      description: "TrueDock, 운영체제 및 TrueNAS 버전을 작성해 주세요."
+      placeholder: |
+        - TrueDock: 1.0.2+5
+        - 기기/운영체제: iPhone / iOS 26 또는 Android 기기 / Android 버전
+        - TrueNAS SCALE: 25.10.x
+    validations:
+      required: true
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: "발생 빈도"
+      options:
+        - "항상"
+        - "자주"
+        - "가끔"
+        - "한 번만 발생"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "로그 및 화면 자료"
+      description: "민감정보를 제거한 로그, 스크린샷 또는 화면 녹화를 첨부해 주세요."
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "확인 사항"
+      options:
+        - label: "최신 릴리즈에서도 문제가 발생하는지 확인했습니다."
+          required: true
+        - label: "기존 Issue에서 같은 문제를 검색했습니다."
+          required: true
+        - label: "첨부 자료에서 민감정보를 제거했습니다."
+          required: true

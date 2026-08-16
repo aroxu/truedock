@@ -1,0 +1,32 @@
+name: "기타 비정형 문의 (한국어)"
+description: "버그나 기능 제안에 해당하지 않는 내용을 자유롭게 작성해 주세요."
+title: "[기타] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        버그 제보나 기능 제안 양식에 맞지 않는 내용을 위한 공간입니다.
+
+        공개 Issue에 서버 주소, 계정, 자격 증명, 인증서 등 민감정보를 올리지 마세요.
+        민감정보가 포함된 Issue 또는 첨부 자료는 별도 고지 없이 삭제될 수 있습니다.
+  - type: textarea
+    id: content
+    attributes:
+      label: "내용"
+      description: "필요한 배경과 요청 사항을 자유롭게 작성해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "추가 정보"
+      description: "관련 링크나 민감정보를 제거한 자료가 있다면 첨부해 주세요."
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "확인 사항"
+      options:
+        - label: "기존 Issue에서 같은 내용을 검색했습니다."
+          required: true
+        - label: "작성 내용과 첨부 자료에 민감정보가 없습니다."
+          required: true

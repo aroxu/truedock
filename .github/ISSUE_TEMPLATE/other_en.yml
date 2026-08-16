@@ -1,0 +1,32 @@
+name: "Other (English)"
+description: "Share something that does not fit the bug or feature templates."
+title: "[Other] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for topics that do not fit the bug report or feature request templates.
+
+        Do not post server addresses, account information, credentials, certificates, or other sensitive data in a public issue.
+        Issues or attachments containing sensitive data may be deleted without notice.
+  - type: textarea
+    id: content
+    attributes:
+      label: "Details"
+      description: "Provide the relevant background and request in your own words."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Additional context"
+      description: "Add relevant links or redacted supporting material if available."
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checklist"
+      options:
+        - label: "I searched existing issues for the same topic."
+          required: true
+        - label: "This issue and its attachments contain no sensitive data."
+          required: true
